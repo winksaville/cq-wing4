@@ -4,9 +4,11 @@ from fattenTe import fattenTe
 
 import cadquery as cq # type: ignore
 
-#import sys
-#print(f'sys.path={sys.path}')
+import sys
+print(f'sys.path={sys.path}')
 
+import os
+print(f'PYTHONPATH={os.environ.get("PYTHONPATH")}')
 
 chord: float = 50 
 h = 100
@@ -31,9 +33,10 @@ splitWingA = halfWing.faces("<Y").workplane(-chord*0.50).split(keepTop=True, kee
 splitWing = splitWingA.faces(">Y").workplane(-chord*0.15).split(keepTop=True, keepBottom=False)
 #show_object(splitWing)
 
-#halfWingShell = splitWing.shell(-0.29)
-halfWingShell = splitWing.shell(-0.72) # OK
-#alfWingShell = splitWing.shell(-0.196) # OK
+# Only works for polyline
+#halfWingShell = splitWing.shell(-0.73) # Fails even for polyline I wonder is a max %
+                                        # with a negative thickness you can shell
+halfWingShell = splitWing.shell(-0.73) # OK with polyline
 show_object(halfWingShell)
 
 
