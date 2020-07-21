@@ -5,7 +5,6 @@ from fattenTe import fattenTe
 #from dumpAttr import dumpAttr
 #from verticesAsList import verticesAsList
 
-from pprint import pprint
 import cadquery as cq # type: ignore
 
 from typing import List, Sequence, Tuple
@@ -13,26 +12,37 @@ from typing import List, Sequence, Tuple
 X = 0
 Y = 1
 Z = 2
+
 dihederal = math.radians(5)
 sweep = math.radians(0)
 h: float = 100
 chord: float = 50 
-wingThickness: float = 0.30
-ribThickness: float = 0.30
+wingThickness: float = 0.10
+ribThickness: float = wingThickness
+
+def show(o: object):
+    if 'show_object' in globals():
+        show_object(o)
+
+def dbg(*args):
+    if 'log' in globals():
+        log(*args)
+    else:
+        print(*args)
 
 # Normalize, Scale, fattenTe
 scaleFactor: float = 1/naca5305[0][0]
 nNaca5305 = scaleListOfTuple(naca5305, scaleFactor)
 sNaca5305: List[Tuple[float, float]] = scaleListOfTuple(nNaca5305, chord)
-fNaca5305: List[Tuple[float, float]] = fattenTe(sNaca5305, 0.30, 10)
+fNaca5305: List[Tuple[float, float]] = fattenTe(sNaca5305, wingThickness, 10)
 
 
 airfoil = (
     cq.Workplane("YZ")
     .polyline(fNaca5305).close()
 )
-log(f'airfoil.val().isValid()={airfoil.val().isValid()}')
-#show_object(airfoil)
+dbg(f'airfoil.val().isValid()={airfoil.val().isValid()}')
+#show(airfoil)
 
 halfWing = (
     airfoil
@@ -43,16 +53,16 @@ halfWing = (
         #.spline([(0, 0, 0), (0, h, h * math.sin(-dihederal))])
     )
 )
-log(f'halfWing.val().isValid()={halfWing.val().isValid()}')
-#show_object(halfWing)
+dbg(f'halfWing.val().isValid()={halfWing.val().isValid()}')
+#show(halfWing)
 
 # Shell the halfWing
 #halfWingShell = halfWing.shell(-0.25)
-#show_object(halfWingShell)
+#show(halfWingShell)
 
 
 halfWingBb = halfWing.val().BoundingBox()
-print(f'ylen={halfWingBb.ylen}, zlen={halfWingBb.zlen}')
+dbg(f'ylen={halfWingBb.ylen}, zlen={halfWingBb.zlen}')
 
 # Create the braces which the ribs will be cut from 
 braceCount = 8
@@ -65,14 +75,14 @@ for i in range(0, braceCount):
         # First rib is 1/2 thickness
         .extrude(ribThickness if i != 0 else ribThickness / 2)
     )
-    #log(f'{i}: braceGap={braceGap} bracePlate.val().isValid()={bracePlate.val().isValid()}')
+    #dbg(f'{i}: braceGap={braceGap} bracePlate.val().isValid()={bracePlate.val().isValid()}')
     bracePlates.append(bracePlate)
-    #show_object(bracePlate)
+    #show(bracePlate)
 
 # Create the ribs
 ribs = [plate.intersect(halfWing) for plate in bracePlates]
 #for rib in ribs:
-#    show_object(rib)
+#    show(rib)
 
 halfWingCutter = (
     cq.Workplane("YZ")
@@ -85,33 +95,32 @@ halfWingCutter = (
         #.spline([(0, 0, 0), (0, h, h * math.sin(-dihederal))])
     )
 )
-#show_object(halfWingCutter)
+#show(halfWingCutter)
 
 # Cut out the center of the halfWing
 halfWingHollow = halfWing.cut(halfWingCutter)
-#show_object(halfWingHollow)
+#show(halfWingHollow)
 
 # Union the ribs and wing
 halfWingWithRibs = halfWingHollow
 for rib in ribs:
     halfWingWithRibs = halfWingWithRibs.union(rib)
-#show_object(halfWingWithRibs)
+#show(halfWingWithRibs)
 
 fullWing = halfWingWithRibs.mirror("YZ").union(halfWingWithRibs)
-log(f'fullWing.val().isValid()={fullWing.val().isValid()}')
-#show_object(fullWing)
+dbg(f'fullWing.val().isValid()={fullWing.val().isValid()}')
+#show(fullWing)
 
 verticalWing = fullWing.rotate((0, 0, 0), (1, 0, 0), -90)
-log(f'verticalWing.val().isValid()={verticalWing.val().isValid()}')
-#show_object(verticalWing)
+dbg(f'verticalWing.val().isValid()={verticalWing.val().isValid()}')
+#show(verticalWing)
 
 wing4 = verticalWing.translate((0, 0, fNaca5305[-1][X] + (h * math.sin(sweep))))
-log(f'wing4.val().isValid()={wing4.val().isValid()}')
-show_object(wing4)
+dbg(f'wing4.val().isValid()={wing4.val().isValid()}')
+show(wing4)
 
-#pprint(vars(wing4))
 import io
 tolerance=0.001;
-f = io.open(f'wing4-direct-{tolerance}.stl', 'w+')
+f = io.open(f'wing4-tol_{tolerance}-tk_{wingThickness}.stl', 'w+')
 cq.exporters.exportShape(wing4, cq.exporters.ExportTypes.STL, f, tolerance)
 f.close()
