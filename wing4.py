@@ -17,7 +17,7 @@ dihederal = math.radians(5)
 sweep = math.radians(0)
 h: float = 100
 chord: float = 50 
-wingThickness: float = 0.10
+wingThickness: float = 0.20
 ribThickness: float = wingThickness
 
 def show(o: object):
@@ -46,11 +46,9 @@ dbg(f'airfoil.val().isValid()={airfoil.val().isValid()}')
 
 halfWing = (
     airfoil
-    #.extrude(h)
     .sweep(
         cq.Workplane("YX")
         .spline([(0, 0, 0), (h * math.sin(sweep), h, h * math.sin(-dihederal))])
-        #.spline([(0, 0, 0), (0, h, h * math.sin(-dihederal))])
     )
 )
 dbg(f'halfWing.val().isValid()={halfWing.val().isValid()}')
@@ -66,11 +64,14 @@ dbg(f'ylen={halfWingBb.ylen}, zlen={halfWingBb.zlen}')
 
 # Create the braces which the ribs will be cut from 
 braceCount = 8
-braceGap: float = (h - ribThickness) / (braceCount-1)
+braceGap: float = h / (braceCount-1)
 bracePlates = []
 for i in range(0, braceCount):
+    ribXPos = i * braceGap
+    if i == (braceCount - 1):
+        ribXPos -= ribThickness
     bracePlate = (
-        cq.Workplane("YZ", origin=(i * braceGap, (halfWingBb.ylen)/2, halfWingBb.zlen/2))
+        cq.Workplane("YZ", origin=(ribXPos, (halfWingBb.ylen)/2, halfWingBb.zlen/2))
         .rect(halfWingBb.ylen * 1.10, halfWingBb.zlen * 1.50)
         # First rib is 1/2 thickness
         .extrude(ribThickness if i != 0 else ribThickness / 2)
@@ -81,18 +82,15 @@ for i in range(0, braceCount):
 
 # Create the ribs
 ribs = [plate.intersect(halfWing) for plate in bracePlates]
-#for rib in ribs:
-#    show(rib)
+#for rib in ribs: show(rib)
 
 halfWingCutter = (
     cq.Workplane("YZ")
     .polyline(fNaca5305).close()
     .offset2D(-wingThickness, 'intersection')
-    #.extrude(h)
     .sweep(
         cq.Workplane("YX")
         .spline([(0, 0, 0), (h * math.sin(sweep), h, h * math.sin(-dihederal))])
-        #.spline([(0, 0, 0), (0, h, h * math.sin(-dihederal))])
     )
 )
 #show(halfWingCutter)
