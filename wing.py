@@ -7,9 +7,11 @@ from fattenTe import fattenTe
 
 import cadquery as cq # type: ignore
 
+from functools import reduce
 from typing import List, Sequence, Tuple
 
 import utils as ut
+import airfoil as af
 
 class Wing:
     """
@@ -18,7 +20,8 @@ class Wing:
 
     @staticmethod
     def makeWing(
-        thickness: float = 0.25,
+        airfoilSeq: af.AirfoilSeq,
+        shellThickness: float = 0.25,
         ctx: object=None,
     ) -> cq.Shape:
 
@@ -30,15 +33,15 @@ class Wing:
         sweep = math.radians(0)
         h: float = 100
         chord: float = 50 
-        wingThickness: float = thickness
-        ribThickness: float = wingThickness
+        wingShellThickness: float = shellThickness
+        ribThickness: float = wingShellThickness
         
         # Normalize, Scale, fattenTe
-        fNaca5305 = ut.scaleAirfoil(naca5305, chord, wingThickness, 0.20)
+        fTeAirfoil = af.scaleAirfoil(airfoilSeq, chord, shellThickness * 2, 0.20)
 
         airfoil = (
             cq.Workplane("YZ")
-            .polyline(fNaca5305).close()
+            .polyline(fTeAirfoil).close()
         )
         ut.dbg(f'airfoil.val().isValid()={airfoil.val().isValid()}')
         #ut.show(airfoil, ctx)
@@ -71,36 +74,44 @@ class Wing:
             bracePlate = (
                 cq.Workplane("YZ", origin=(ribXPos, (halfWingBb.ylen)/2, halfWingBb.zlen/2))
                 .rect(halfWingBb.ylen * 1.10, halfWingBb.zlen * 1.50)
-                # First rib is 1/2 thickness
+                # First rib is 1/2 ribThickness
                 .extrude(ribThickness if i != 0 else ribThickness / 2)
             )
             #ut.dbg(f'{i}: braceGap={braceGap} bracePlate.val().isValid()={bracePlate.val().isValid()}')
             bracePlates.append(bracePlate)
             #ut.show(bracePlate, ctx)
+        ut.dbg(f'len(bracePlates)={len(bracePlates)}')
+        bracesValid = reduce(lambda value, rib: value and rib.val().isValid(), bracePlates, True)
+        ut.dbg(f'bracesValid={bracesValid}')
         
         # Create the ribs
         ribs = [plate.intersect(halfWing) for plate in bracePlates]
+        ribsValid = reduce(lambda value, rib: value and rib.val().isValid(), ribs, True)
+        ut.dbg(f'ribsValid={ribsValid}')
         #for rib in ribs: ut.show(rib, ctx)
         
         halfWingCutter = (
             cq.Workplane("YZ")
-            .polyline(fNaca5305).close()
-            .offset2D(-wingThickness, 'intersection')
+            .polyline(fTeAirfoil).close()
+            .offset2D(-wingShellThickness, 'intersection')
             .sweep(
                 cq.Workplane("YX")
                 .spline([(0, 0, 0), (h * math.sin(sweep), h, h * math.sin(-dihederal))])
             )
         )
+        ut.dbg(f'halfWingCutter.val().isValid()={halfWingCutter.val().isValid()}')
         #ut.show(halfWingCutter, ctx)
         
         # Cut out the center of the halfWing
         halfWingHollow = halfWing.cut(halfWingCutter)
+        ut.dbg(f'halfWingHollow.val().isValid()={halfWingHollow.val().isValid()}')
         #ut.show(halfWingHollow, ctx)
         
-        # Union the ribs and wing
+        # Union the ribs and wing, this is slow
         halfWingWithRibs = halfWingHollow
         for rib in ribs:
             halfWingWithRibs = halfWingWithRibs.union(rib)
+        ut.dbg(f'halfWingWithRibs.val().isValid()={halfWingWithRibs.val().isValid()}')
         #ut.show(halfWingWithRibs, ctx)
         
         fullWing = halfWingWithRibs.mirror("YZ").union(halfWingWithRibs)
@@ -111,10 +122,10 @@ class Wing:
         ut.dbg(f'verticalWing.val().isValid()={verticalWing.val().isValid()}')
         #ut.show(verticalWing, ctx)
         
-        wing = verticalWing.translate((0, 0, fNaca5305[-1][X] + (h * math.sin(sweep))))
+        wing = verticalWing.translate((0, 0, fTeAirfoil[-1][X] + (h * math.sin(sweep))))
         ut.dbg(f'wing.val().isValid()={wing.val().isValid()}')
         return wing
 
 if __name__ == '__main__' or 'show_object' in globals():
-    w = Wing.makeWing()
+    w = Wing.makeWing(naca5305, shellThickness=0.20)
     ut.show(w, ctx=globals())

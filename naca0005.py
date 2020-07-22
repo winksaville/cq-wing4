@@ -1,7 +1,8 @@
 # NACA 0005 Airfoil M=0.0% P=0.0% T=5.0%]
-from typing import List, Tuple
 
-naca0005: List[Tuple[float, float]] = [
+from airfoil import AirfoilSeq
+
+naca0005: AirfoilSeq = AirfoilSeq([
     (1.000000,  0.000525)
   , (0.998459,  0.000615)
   , (0.993844,  0.000884)
@@ -83,4 +84,4 @@ naca0005: List[Tuple[float, float]] = [
   , (0.993844, -0.000884)
   , (0.998459, -0.000615)
   , (1.000000, -0.000525)
-]
+])

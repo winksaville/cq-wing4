@@ -1,9 +1,9 @@
 # NACA 5305 Airfoil M=5.0% P=30.0% T=5.0%
 # From: http://airfoiltools.com/airfoil/naca4digit?MNaca4DigitForm%5Bcamber%5D=5&MNaca4DigitForm%5Bposition%5D=30&MNaca4DigitForm%5Bthick%5D=5&MNaca4DigitForm%5BnumPoints%5D=81&MNaca4DigitForm%5BcosSpace%5D=0&MNaca4DigitForm%5BcosSpace%5D=1&MNaca4DigitForm%5BcloseTe%5D=0&yt0=Plot
 
-from typing import List, Tuple
+from airfoil import AirfoilSeq
 
-naca5305: List[Tuple[float, float]] = [
+naca5305: AirfoilSeq = AirfoilSeq([
     (1.000074, 0.000520)
   , (0.998545, 0.000829)
   , (0.993968, 0.001750)
@@ -85,4 +85,4 @@ naca5305: List[Tuple[float, float]] = [
   , (0.993720, 0.000001)
   , (0.998372,-0.000389)
   , (0.999926,-0.000520)
-]
+])
