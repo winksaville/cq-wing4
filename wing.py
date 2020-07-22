@@ -16,9 +16,10 @@ class Wing:
     Create a wing
     """
 
+    @staticmethod
     def makeWing(
-        ctx=None,
         thickness: float = 0.25,
+        ctx: object=None,
     ) -> cq.Shape:
 
         X = 0
@@ -33,12 +34,8 @@ class Wing:
         ribThickness: float = wingThickness
         
         # Normalize, Scale, fattenTe
-        scaleFactor: float = 1/naca5305[0][0]
-        nNaca5305 = scaleListOfTuple(naca5305, scaleFactor)
-        sNaca5305: List[Tuple[float, float]] = scaleListOfTuple(nNaca5305, chord)
-        fNaca5305: List[Tuple[float, float]] = fattenTe(sNaca5305, wingThickness, 10)
-        
-        
+        fNaca5305 = ut.scaleAirfoil(naca5305, chord, wingThickness, 0.20)
+
         airfoil = (
             cq.Workplane("YZ")
             .polyline(fNaca5305).close()
@@ -56,7 +53,6 @@ class Wing:
         ut.dbg(f'halfWing.val().isValid()={halfWing.val().isValid()}')
         #ut.show(halfWing, ctx)
 
-        
         # Shell the halfWing
         #halfWingShell = halfWing.shell(-0.25)
         #ut.show(halfWingShell, ctx)

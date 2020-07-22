@@ -2,12 +2,17 @@
 Some scaling functions
 """
 
-def scaleTuple(t, v):
+from typing import cast, List, Sequence, Tuple
+
+def scaleTuple(t: Tuple[float, ...], v: float) -> Tuple[float, ...]:
     """Scale the elements of the tuple by v"""
     #print(f'scaleTuple: t={t} v={v}')
-    return tuple(map(lambda p: p * v, t))
+    return tuple(i for i in map(lambda p: p * v, t))
 
-def scaleListOfTuple(l, v):
+def scaleListOfTuple(l: Sequence[Tuple[float, float]], v: float) -> List[Tuple[float, float]]:
     """Scale the elements list of tuples by v"""
-    return list(map(lambda t: scaleTuple(t, v), l))
-
+    # There is probably a more Pythonic way to do this
+    result: List[Tuple[float, float]] = []
+    for t in map(lambda t: scaleTuple(t, v), l):
+        result.append(cast(Tuple[float, float], tuple(n for n in t)))
+    return result

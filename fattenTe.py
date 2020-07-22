@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, Sequence, List
 
 def fattenTe(af: List[Tuple[float, float]], t: float, count: int) -> List[Tuple[float, float]]:
     """
@@ -21,20 +21,24 @@ def fattenTe(af: List[Tuple[float, float]], t: float, count: int) -> List[Tuple[
     #print(f'2 len(af)={len(af)} t={t} count={count} halfT={halfT} units={units} topTeIdx={topTeIdx} btmTeIdx={btmTeIdx} {af[topTeIdx][X]} {af[btmTeIdx][X]}')
     ft: List[Tuple[float, float]] = []
     i: int
+
+    # Fatten the TE "top" side of the airfoil
     for i in range(0, count):
         v = (count - i) * units
         #print(f'i={i} v={v} af[{i}][X]={af[i][X]} af[{i}][Y]={af[i][Y]}')
         ft.append((af[i][X], af[i][Y] + v))
         #print(f'i={i} v={v} ft[{i}][X]={ft[i][X]} ft[{i}][Y]={ft[i][Y]}')
 
+    # Just copy the next tuples until we reach the "bottom" side to fatten
     for i in range(count, len(af) - count):
         ft.append((af[i][X], af[i][Y]))
         #print(f'i={i} v={v} ft[{i}][X]={ft[i][X]} ft[{i}][Y]={ft[i][Y]}')
 
+    # Fatten the TE "bottom" side of the airfoil
     for i in range(len(af) - count, len(af)):
         v = (i - (len(af) - count) + 1) * units
         #print(f'i={i} v={v} af[{i}][X]={af[i][X]} af[{i}][Y]={af[i][Y]}')
         ft.append((af[i][X], af[i][Y] - v))
         #print(f'i={i} v={v} ft[{i}][X]={ft[i][X]} ft[{i}][Y]={ft[i][Y]}')
 
-    return ft
+    return ft;
