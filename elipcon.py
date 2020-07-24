@@ -136,14 +136,14 @@ if __name__ == '__main__' or 'show_object' in globals():
     body1 = body.cut(c.female)
     #ut.show(body1, ctx=globals())
 
-    body2 = copy(body1).translate((10, 0, 0))
+    body2 = copy(body1).translate((20, 0, 0))
     #ut.show(body2, ctx=globals())
 
-    result = body1.add(body2).combine()
-    ut.show(result.solids())
+    result = body1.add(body2).combine().rotate((0, 0, 0), (1, 0, 0), 90).translate((0, 0, bodyEllipse2d.yLen / 2))
+    ut.show(result)
 
     import io
     tolerance=0.001;
     f = io.open(f'elipcon-tol_{tolerance}.stl', 'w+')
-    cq.exporters.exportShape(result.solids(), cq.exporters.ExportTypes.STL, f, tolerance)
+    cq.exporters.exportShape(result, cq.exporters.ExportTypes.STL, f, tolerance)
     f.close()
