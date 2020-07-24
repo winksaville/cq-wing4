@@ -1,17 +1,20 @@
 import math
-from naca5305 import naca5305
-from scale import scaleListOfTuple
-from fattenTe import fattenTe
-#from dumpAttr import dumpAttr
-#from verticesAsList import verticesAsList
-
-import cadquery as cq # type: ignore
-
 from functools import reduce
 from typing import List, Sequence, Tuple
 
-import utils as ut
+import cadquery as cq  # type: ignore
+
 import airfoil as af
+import utils as ut
+from fattenTe import fattenTe
+from naca5305 import naca5305
+from scale import scaleListOfTuple
+
+#from dumpAttr import dumpAttr
+#from verticesAsList import verticesAsList
+
+
+
 
 class Wing:
     """

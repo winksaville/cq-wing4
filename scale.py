@@ -2,7 +2,8 @@
 Some scaling functions
 """
 
-from typing import cast, List, Sequence, Tuple
+from typing import List, Sequence, Tuple, cast
+
 
 def scaleTuple(t: Tuple[float, ...], v: float) -> Tuple[float, ...]:
     """Scale the elements of the tuple by v"""

@@ -1,4 +1,5 @@
-from typing import Tuple, Sequence, List
+from typing import List, Sequence, Tuple
+
 
 def fattenTe(af: List[Tuple[float, float]], t: float, count: int) -> List[Tuple[float, float]]:
     """

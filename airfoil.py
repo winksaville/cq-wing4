@@ -1,7 +1,9 @@
-from scale import scaleListOfTuple
+from typing import Iterable, List, NewType, Sequence, Tuple, cast
+
+import cadquery as cq  # type: ignore
+
 from fattenTe import fattenTe
-import cadquery as cq # type: ignore
-from typing import List, Sequence, Tuple, Iterable, NewType, cast
+from scale import scaleListOfTuple
 
 AirfoilSeq = NewType('AirfoilSeq', Sequence[Tuple[float, float]])
 AirfoilList = NewType('AirfoilList', List[Tuple[float, float]])

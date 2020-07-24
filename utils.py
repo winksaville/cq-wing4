@@ -1,4 +1,5 @@
-import cadquery as cq # type: ignore
+import cadquery as cq  # type: ignore
+
 
 def show(o: object, ctx=None):
     """

@@ -1,12 +1,12 @@
 import math
-
-import cadquery as cq # type: ignore
-
-from typing import List, Sequence, Tuple
-from dataclasses import dataclass
 from copy import copy, deepcopy
+from dataclasses import dataclass
+from typing import List, Sequence, Tuple
+
+import cadquery as cq  # type: ignore
 
 import utils as ut
+
 
 class RectCon:
     """

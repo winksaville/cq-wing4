@@ -1,4 +1,5 @@
 import cadquery as cq
+
 result = (
     cq.Workplane("front")
     .ellipse(2, 4)

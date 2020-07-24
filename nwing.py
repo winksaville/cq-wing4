@@ -1,13 +1,15 @@
+import sys
+
+import cadquery as cq  # type: ignore
+
+from fattenTe import fattenTe
 from naca5305 import naca5305
 from scale import scaleListOfTuple
-from fattenTe import fattenTe
 
-import cadquery as cq # type: ignore
-
-import sys
 print(f'sys.path={sys.path}')
 
 import os
+
 print(f'PYTHONPATH={os.environ.get("PYTHONPATH")}')
 
 chord: float = 50 
