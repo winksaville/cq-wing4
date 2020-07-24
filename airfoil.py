@@ -5,8 +5,9 @@ import cadquery as cq  # type: ignore
 from fattenTe import fattenTe
 from scale import scaleListOfTuple
 
-AirfoilSeq = NewType('AirfoilSeq', Sequence[Tuple[float, float]])
-AirfoilList = NewType('AirfoilList', List[Tuple[float, float]])
+AirfoilSeq = NewType("AirfoilSeq", Sequence[Tuple[float, float]])
+AirfoilList = NewType("AirfoilList", List[Tuple[float, float]])
+
 
 def scaleAirfoil(
     airFoil: AirfoilSeq,
@@ -17,9 +18,12 @@ def scaleAirfoil(
     """
     Normalize, Scale, fattenTe an airfoil
     """
-    scaleFactor: float = 1/airFoil[0][0]
+    scaleFactor: float = 1 / airFoil[0][0]
     nAirfoil: List[Tuple[float, float]] = scaleListOfTuple(airFoil, scaleFactor)
     sAirfoil: List[Tuple[float, float]] = scaleListOfTuple(nAirfoil, chord)
-    fAirfoil: AirfoilList = cast(AirfoilList, fattenTe(sAirfoil, teThickness, round(chord * percentChordToFattenTe)))
+    fAirfoil: AirfoilList = cast(
+        AirfoilList,
+        fattenTe(sAirfoil, teThickness, round(chord * percentChordToFattenTe)),
+    )
 
     return fAirfoil

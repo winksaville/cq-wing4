@@ -7,18 +7,20 @@ def show(o: object, ctx=None):
     otherwise does the best it can.
     """
     if o == None:
-        dbg('o=None')
-    elif ctx != None and 'show_object' in ctx:
-        ctx['show_object'](o)
+        dbg("o=None")
+    elif ctx != None and "show_object" in ctx:
+        ctx["show_object"](o)
     elif isinstance(o, cq.Shape):
-        dbg(f'o.val().isValid()={o.val().isValid()}')
+        dbg(f"o.val().isValid()={o.val().isValid()}")
     else:
-        dbg(f'vars={vars(o)}')
+        dbg(f"vars={vars(o)}")
+
 
 def dbg(*args):
     print(*args)
 
-#def dbg(*args, ctx=None):
+
+# def dbg(*args, ctx=None):
 #    """
 #    Output via log of cq-editor or use print
 #    """
