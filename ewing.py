@@ -1,5 +1,7 @@
 import cadquery as cq  # type: ignore
 
+from utils import show
+
 chord: float = 50
 h = 100
 
@@ -33,4 +35,4 @@ halfWingShell = halfWing.shell(-2.549537795)  # OK
 # halfWingShell = halfWing.shell(-2.4) # OK
 # halfWingShell = halfWing.shell(-2.3) # OK
 # halfWingShell = halfWing.shell(-1) # OK
-show_object(halfWingShell)
+show(halfWingShell)

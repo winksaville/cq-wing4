@@ -1,5 +1,7 @@
 from typing import List, Sequence, Tuple
 
+from utils import X, Y
+
 
 def fattenTe(
     af: List[Tuple[float, float]], t: float, count: int
@@ -14,8 +16,6 @@ def fattenTe(
     units: float = halfT / count
     topTeIdx: int = 0
     btmTeIdx: int = len(af) - 1
-    X: int = 0
-    Y: int = 1
     # print(f'1 len(af)={len(af)} t={t} count={count} halfT={halfT} units={units} topTeIdx={topTeIdx} btmTeIdx={btmTeIdx} {af[topTeIdx][X]} {af[btmTeIdx][X]}')
     if af[topTeIdx][X] != af[btmTeIdx][X]:
         # Add an extra point so that te is square not a point.

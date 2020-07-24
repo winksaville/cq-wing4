@@ -5,6 +5,7 @@ import cadquery as cq  # type: ignore
 from fattenTe import fattenTe
 from naca5305 import naca5305
 from scale import scaleListOfTuple
+from utils import show
 
 print(f"sys.path={sys.path}")
 
@@ -33,19 +34,19 @@ halfWingBb = halfWing.val().BoundingBox()
 splitWingA = (
     halfWing.faces("<Y").workplane(-chord * 0.50).split(keepTop=True, keepBottom=False)
 )
-# show_object(splitWingA)
+# show(splitWingA)
 splitWing = (
     splitWingA.faces(">Y")
     .workplane(-chord * 0.15)
     .split(keepTop=True, keepBottom=False)
 )
-# show_object(splitWing)
+# show(splitWing)
 
 # Only works for polyline
 # halfWingShell = splitWing.shell(-0.73) # Fails even for polyline I wonder is a max %
 # with a negative thickness you can shell
 halfWingShell = splitWing.shell(-0.73)  # OK with polyline
-show_object(halfWingShell)
+show(halfWingShell)
 
 
 # Split the wing to determine where it can shelled. As it turns
@@ -55,14 +56,14 @@ show_object(halfWingShell)
 # If workplane is >= 0.9902054 FAILS
 # splitWing = halfWing.faces(">Y").workplane(-chord*0.9902054).split(keepTop=True, keepBottom=False)
 
-## if workplace is < -chord*0.9902053 SUCCEEDS!
+# # if workplace is < -chord*0.9902053 SUCCEEDS!
 # splitWing = halfWing.faces(">Y").workplane(-chord*0.9902053).split(keepTop=True, keepBottom=False)
-##splitWing = halfWing.faces(">Y").workplane(-chord*0.8).split(keepTop=True, keepBottom=False)
+# #splitWing = halfWing.faces(">Y").workplane(-chord*0.8).split(keepTop=True, keepBottom=False)
 #
 # log(f'splitWing.isValid()={splitWing.val().isValid()}')
-##show_object(splitWing)
+# #show(splitWing)
 # splitWingShell = splitWing.shell(-0.0270)
-# show_object(splitWingShell)
+# show(splitWingShell)
 
 # Shell the halfWing with splined airfoil and use small
 # positive values for thickness shelling works. If the
@@ -85,6 +86,6 @@ show_object(halfWingShell)
 # alfWingShell = halfWing.shell(-0.000000000000000000000001) # StdFail_NotDone: BRep_API: command not done
 # alfWingShell = halfWing.shell(-0.000002) # StdFail_NotDone: BRep_API: command not done
 
-# show_object(halfWingShell)
-# show_object(halfWing)
-# show_object(airfoil)
+# show(halfWingShell)
+# show(halfWing)
+# show(airfoil)

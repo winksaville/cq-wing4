@@ -5,7 +5,7 @@ from typing import List, Sequence, Tuple
 
 import cadquery as cq  # type: ignore
 
-import utils as ut
+from utils import dbg, show
 
 
 @dataclass
@@ -29,7 +29,7 @@ class EllipseCon:
     male: cq.Shape
 
     def __init__(self, elip: Ellipse, height: float, ctx: object = None,) -> None:
-        ut.dbg(f"Ellipse.make: elip={elip} height={height}")
+        dbg(f"Ellipse.make: elip={elip} height={height}")
 
         fillets = 0.125
 
@@ -81,8 +81,8 @@ class EllipseCon:
             .fillet(fillets)
         )
         eBb = e.val().BoundingBox()
-        ut.dbg(f"eBb: xlen={eBb.xlen} ylen={eBb.ylen} zlen={eBb.zlen}")
-        # ut.show(e, ctx=globals())
+        dbg(f"eBb: xlen={eBb.xlen} ylen={eBb.ylen} zlen={eBb.zlen}")
+        # show(e, ctx=globals())
 
         reliefOther = max(elip.xLen, elip.yLen)
         xRelief = (
@@ -92,7 +92,7 @@ class EllipseCon:
             .edges("<Z")
             .fillet(fillets)
         )
-        # ut.show(xRelief, ctx=globals())
+        # show(xRelief, ctx=globals())
 
         yRelief = (
             cq.Workplane("XY", origin=(0, 0, reliefHeight))
@@ -101,26 +101,24 @@ class EllipseCon:
             .edges("<Z")
             .fillet(fillets)
         )
-        # ut.show(yRelief, ctx=globals())
+        # show(yRelief, ctx=globals())
 
         # Cut out the reliefs
         self.male = e.cut(yRelief).cut(xRelief)
         # self.male = e.cut(xRelief).cut(yRelief) # BAD, why?
-        # ut.show(self.male, ctx=globals())
+        # show(self.male, ctx=globals())
 
         maleBb = self.male.val().BoundingBox()
-        ut.dbg(f"maleBb: xlen={maleBb.xlen} ylen={maleBb.ylen} zlen={maleBb.zlen}")
+        dbg(f"maleBb: xlen={maleBb.xlen} ylen={maleBb.ylen} zlen={maleBb.zlen}")
 
         self.female = e
         femaleBb = self.female.val().BoundingBox()
-        ut.dbg(
-            f"femaleBb: xlen={femaleBb.xlen} ylen={femaleBb.ylen} zlen={maleBb.zlen}"
-        )
+        dbg(f"femaleBb: xlen={femaleBb.xlen} ylen={femaleBb.ylen} zlen={maleBb.zlen}")
 
 
 if __name__ == "__main__" or "show_object" in globals():
     c = EllipseCon(Ellipse(xLen=6, yLen=10), height=10)
-    # ut.show(c.male, ctx=globals())
+    # show(c.male, ctx=globals())
 
     bodyEllipse2d = Ellipse(xLen=8, yLen=12)
 
@@ -132,10 +130,10 @@ if __name__ == "__main__" or "show_object" in globals():
     )
     body = c.male.translate((0, 0, bodyLen)).union(body)
     body1 = body.cut(c.female)
-    # ut.show(body1, ctx=globals())
+    # show(body1, ctx=globals())
 
     body2 = copy(body1).translate((20, 0, 0))
-    # ut.show(body2, ctx=globals())
+    # show(body2, ctx=globals())
 
     result = (
         body1.add(body2)
@@ -143,7 +141,7 @@ if __name__ == "__main__" or "show_object" in globals():
         .rotate((0, 0, 0), (1, 0, 0), 90)
         .translate((0, 0, bodyEllipse2d.yLen / 2))
     )
-    ut.show(result)
+    show(result)
 
     import io
 

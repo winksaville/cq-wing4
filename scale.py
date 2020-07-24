@@ -12,11 +12,11 @@ def scaleTuple(t: Tuple[float, ...], v: float) -> Tuple[float, ...]:
 
 
 def scaleListOfTuple(
-    l: Sequence[Tuple[float, float]], v: float
+    lst: Sequence[Tuple[float, float]], v: float
 ) -> List[Tuple[float, float]]:
     """Scale the elements list of tuples by v"""
     # There is probably a more Pythonic way to do this
     result: List[Tuple[float, float]] = []
-    for t in map(lambda t: scaleTuple(t, v), l):
+    for t in map(lambda t: scaleTuple(t, v), lst):
         result.append(cast(Tuple[float, float], tuple(n for n in t)))
     return result

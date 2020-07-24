@@ -5,7 +5,7 @@ from typing import List, Sequence, Tuple
 
 import cadquery as cq  # type: ignore
 
-import utils as ut
+from utils import dbg, show
 
 
 class RectCon:
@@ -27,7 +27,7 @@ class RectCon:
         fillets=0.250,
         ctx: object = None,
     ) -> None:
-        ut.dbg(f"RectCon.init: xLen={xLen} yLen={yLen} zLen={zLen}")
+        dbg(f"RectCon.init: xLen={xLen} yLen={yLen} zLen={zLen}")
 
         r = (
             cq.Workplane("XY")
@@ -37,18 +37,18 @@ class RectCon:
             .fillet(fillets)
         )
         rBb = r.val().BoundingBox()
-        ut.dbg(f"rBb: xlen={rBb.xlen} ylen={rBb.ylen} zlen={rBb.zlen}")
-        # ut.show(e, ctx=globals())
+        dbg(f"rBb: xlen={rBb.xlen} ylen={rBb.ylen} zlen={rBb.zlen}")
+        # show(e, ctx=globals())
 
         self.male = r
         self.maleBb = self.male.val().BoundingBox()
-        ut.dbg(
+        dbg(
             f"maleBb: xlen={self.maleBb.xlen} ylen={self.maleBb.ylen} zlen={self.maleBb.zlen}"
         )
 
         self.female = r
         self.femaleBb = self.female.val().BoundingBox()
-        ut.dbg(
+        dbg(
             f"femaleBb: xlen={self.femaleBb.xlen} ylen={self.femaleBb.ylen} zlen={self.maleBb.zlen}"
         )
 
@@ -67,7 +67,7 @@ if __name__ == "__main__" or "show_object" in globals():
             return self.yLen / 2
 
     c = RectCon()
-    # ut.show(c.male, ctx=globals())
+    # show(c.male, ctx=globals())
 
     bodyEllipse2d = Ellipse(xLen=8, yLen=12)
 
@@ -80,10 +80,10 @@ if __name__ == "__main__" or "show_object" in globals():
     body1 = body.cut(
         c.female.rotate((0, 0, 0), (1, 0, 0), 180).translate((0, 0, bodyLen))
     ).cut(c.female)
-    # ut.show(body1, ctx=globals())
+    # show(body1, ctx=globals())
 
     body2 = body1.translate((20, 0, 0))
-    # ut.show(body2, ctx=globals())
+    # show(body2, ctx=globals())
 
     stick1 = (
         c.male.rotate((0, 0, 0), (1, 0, 0), 180)
@@ -91,9 +91,9 @@ if __name__ == "__main__" or "show_object" in globals():
         .translate((0, 0, c.maleBb.zlen))
     )
     stick1 = stick1.translate((40, 0, 0))
-    # ut.show(stick1, ctx=globals())
+    # show(stick1, ctx=globals())
     stick2 = stick1.translate((20, 0, 0))
-    # ut.show(stick2, ctx=globals())
+    # show(stick2, ctx=globals())
 
     bodies = (
         body1.add(body2)
@@ -108,7 +108,7 @@ if __name__ == "__main__" or "show_object" in globals():
         .translate((0, 0, c.maleBb.ylen / 2))
     )
     result = bodies.add(sticks).combine()
-    ut.show(result)
+    show(result)
 
     import io
 

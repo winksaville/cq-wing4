@@ -1,14 +1,18 @@
 import cadquery as cq  # type: ignore
 
+X: int = 0
+Y: int = 1
+Z: int = 2
+
 
 def show(o: object, ctx=None):
     """
     Show an object, support show_object from cq-editor
     otherwise does the best it can.
     """
-    if o == None:
+    if o is None:
         dbg("o=None")
-    elif ctx != None and "show_object" in ctx:
+    elif ctx is not None and "show_object" in ctx:
         ctx["show_object"](o)
     elif isinstance(o, cq.Shape):
         dbg(f"o.val().isValid()={o.val().isValid()}")

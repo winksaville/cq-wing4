@@ -1,12 +1,12 @@
 import cadquery as cq  # type: ignore
 
-import utils as ut
-import wing as w
 from naca5305 import naca5305
+from utils import show
+from wing import Wing
 
 tk = 0.25
-wing = w.Wing.makeWing(airfoilSeq=naca5305, shellThickness=tk, ctx=globals())
-ut.show(wing, ctx=globals())
+wing = Wing.makeWing(airfoilSeq=naca5305, shellThickness=tk, ctx=globals())
+show(wing, ctx=globals())
 
 import io
 
