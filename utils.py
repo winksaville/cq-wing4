@@ -1,3 +1,6 @@
+from functools import reduce
+from typing import List, Sequence, Tuple, Union
+
 import cadquery as cq  # type: ignore
 
 X: int = 0
@@ -22,6 +25,13 @@ def show(o: object, ctx=None):
 
 def dbg(*args):
     print(*args)
+
+
+def valid(wp: Union[cq.Workplane, Sequence[cq.Workplane]]) -> bool:
+    if isinstance(wp, Sequence):
+        return reduce(lambda value, s: value and s.val().isValid(), wp, True)
+    else:
+        return wp.val().isValid()
 
 
 # def dbg(*args, ctx=None):

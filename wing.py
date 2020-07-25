@@ -8,10 +8,7 @@ import airfoil as af
 from fattenTe import fattenTe
 from naca5305 import naca5305
 from scale import scaleListOfTuple
-from utils import X, dbg, show
-
-# from dumpAttr import dumpAttr
-# from verticesAsList import verticesAsList
+from utils import X, dbg, show, valid
 
 
 class Wing:
@@ -21,7 +18,10 @@ class Wing:
 
     @staticmethod
     def makeWing(
-        airfoilSeq: af.AirfoilSeq, shellThickness: float = 0.25, ctx: object = None,
+        airfoilSeq: af.AirfoilSeq,  # Sequence of points defining the airfoil
+        incidenceAngle: float = 2.0,  # Angle of LE of wing above the TE
+        shellThickness: float = 0.25,  # Thickness of wing surfaces and ribs
+        ctx: object = None,  # Context used for show and dbg
     ) -> cq.Shape:
 
         dihederal = math.radians(5)
@@ -35,7 +35,7 @@ class Wing:
         fTeAirfoil = af.scaleAirfoil(airfoilSeq, chord, shellThickness * 2, 0.20)
 
         airfoil = cq.Workplane("YZ").polyline(fTeAirfoil).close()
-        dbg(f"airfoil.val().isValid()={airfoil.val().isValid()}")
+        dbg(f"valid(airfoil)={valid(airfoil)}")
         # show(airfoil, ctx)
 
         halfWing = airfoil.sweep(
@@ -43,7 +43,7 @@ class Wing:
                 [(0, 0, 0), (h * math.sin(sweep), h, h * math.sin(-dihederal))]
             )
         )
-        dbg(f"halfWing.val().isValid()={halfWing.val().isValid()}")
+        dbg(f"valid(halfWing)={valid(halfWing)}")
         # show(halfWing, ctx)
 
         # Shell the halfWing
@@ -56,7 +56,7 @@ class Wing:
         # Create the braces which the ribs will be cut from
         braceCount = 8
         braceGap: float = h / (braceCount - 1)
-        bracePlates = []
+        bracePlates: Sequence[cq.Shape] = []
         for i in range(0, braceCount):
             ribXPos = i * braceGap
             if i == (braceCount - 1):
@@ -68,19 +68,14 @@ class Wing:
                 # First rib is 1/2 ribThickness
                 .extrude(ribThickness if i != 0 else ribThickness / 2)
             )
-            # dbg(f'{i}: braceGap={braceGap} bracePlate.val().isValid()={bracePlate.val().isValid()}')
+            # dbg(f'{i}: braceGap={braceGap} valid(bracePlate)={valid(bracePlate)}')
             bracePlates.append(bracePlate)
             # show(bracePlate, ctx)
-        dbg(f"len(bracePlates)={len(bracePlates)}")
-        bracesValid = reduce(
-            lambda value, rib: value and rib.val().isValid(), bracePlates, True
-        )
-        dbg(f"bracesValid={bracesValid}")
+        dbg(f"valid(bracePlages)={valid(bracePlates)}")
 
         # Create the ribs
         ribs = [plate.intersect(halfWing) for plate in bracePlates]
-        ribsValid = reduce(lambda value, rib: value and rib.val().isValid(), ribs, True)
-        dbg(f"ribsValid={ribsValid}")
+        dbg(f"valid(ribs)={valid(ribs)}")
         # for rib in ribs: show(rib, ctx)
 
         halfWingCutter = (
@@ -94,31 +89,38 @@ class Wing:
                 )
             )
         )
-        dbg(f"halfWingCutter.val().isValid()={halfWingCutter.val().isValid()}")
+        dbg(f"valid(halfWingCutter)={valid(halfWingCutter)}")
         # show(halfWingCutter, ctx)
 
         # Cut out the center of the halfWing
         halfWingHollow = halfWing.cut(halfWingCutter)
-        dbg(f"halfWingHollow.val().isValid()={halfWingHollow.val().isValid()}")
+        dbg(f"valid(halfWingHollow)={valid(halfWingHollow)}")
         # show(halfWingHollow, ctx)
 
         # Union the ribs and wing, this is slow
         halfWingWithRibs = halfWingHollow
         for rib in ribs:
             halfWingWithRibs = halfWingWithRibs.union(rib)
-        dbg(f"halfWingWithRibs.val().isValid()={halfWingWithRibs.val().isValid()}")
+        dbg(f"valid(halfWingWithRibs)={valid(halfWingWithRibs)}")
         # show(halfWingWithRibs, ctx)
 
         fullWing = halfWingWithRibs.mirror("YZ").union(halfWingWithRibs)
-        dbg(f"fullWing.val().isValid()={fullWing.val().isValid()}")
+        dbg(f"valid(fullWing)={valid(fullWing)}")
         # show(fullWing, ctx)
 
         verticalWing = fullWing.rotate((0, 0, 0), (1, 0, 0), -90)
-        dbg(f"verticalWing.val().isValid()={verticalWing.val().isValid()}")
+        dbg(f"valid(verticalWing)={valid(verticalWing)}")
         # show(verticalWing, ctx)
 
-        wing = verticalWing.translate((0, 0, fTeAirfoil[-1][X] + (h * math.sin(sweep))))
-        dbg(f"wing.val().isValid()={wing.val().isValid()}")
+        # Translate so TE is at the origin
+        wingTranslated = verticalWing.translate(
+            (0, 0, fTeAirfoil[-1][X] + (h * math.sin(sweep)))
+        )
+        dbg(f"valid(wingTranslated)={valid(wingTranslated)}")
+
+        # Rotate by incidence angle
+        wing = wingTranslated.rotate((0, 0, 0), (1, 0, 0), -incidenceAngle)
+        dbg(f"valid(wing)={valid(wing)}")
         return wing
 
 
