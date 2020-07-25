@@ -55,16 +55,7 @@ class RectCon:
 
 if __name__ == "__main__" or "show_object" in globals():
 
-    @dataclass
-    class Ellipse:
-        xLen: float
-        yLen: float
-
-        def xAxis(self):
-            return self.xLen / 2
-
-        def yAxis(self):
-            return self.yLen / 2
+    from ellipse import Ellipse
 
     c = RectCon()
     # show(c.male, ctx=globals())

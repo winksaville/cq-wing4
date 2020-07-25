@@ -19,15 +19,19 @@ class Wing:
     @staticmethod
     def makeWing(
         airfoilSeq: af.AirfoilSeq,  # Sequence of points defining the airfoil
-        incidenceAngle: float = 2.0,  # Angle of LE of wing above the TE
+        chord: float = 50,  # Wing length LE to TE
+        span: float = 100,  # Wing span from wing tip to wing tip
+        incidenceAngle: float = 2.0,  # Angle in degrees of LE of wing above the TE
+        dihederal=0,  # Angle in degrees of root to wing tip
+        sweep=0,  # Angle of sweep back in degrees of LE
+        # 0 is perpendicular to root, >0 is sweept back, <0 is sweept forward
         shellThickness: float = 0.25,  # Thickness of wing surfaces and ribs
         ctx: object = None,  # Context used for show and dbg
     ) -> cq.Shape:
 
-        dihederal = math.radians(5)
-        sweep = math.radians(0)
-        h: float = 100
-        chord: float = 50
+        dihederal = math.radians(dihederal)
+        sweep = math.radians(sweep)
+        h: float = span / 2
         wingShellThickness: float = shellThickness
         ribThickness: float = wingShellThickness
 
@@ -56,7 +60,7 @@ class Wing:
         # Create the braces which the ribs will be cut from
         braceCount = 8
         braceGap: float = h / (braceCount - 1)
-        bracePlates: Sequence[cq.Shape] = []
+        bracePlates: List[cq.Shape] = []
         for i in range(0, braceCount):
             ribXPos = i * braceGap
             if i == (braceCount - 1):
