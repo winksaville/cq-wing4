@@ -1,5 +1,4 @@
 import math
-from functools import reduce
 from typing import List, Sequence, Tuple
 
 import cadquery as cq  # type: ignore
@@ -22,21 +21,28 @@ class Wing:
         chord: float = 50,  # Wing length LE to TE
         span: float = 100,  # Wing span from wing tip to wing tip
         incidenceAngle: float = 2.0,  # Angle in degrees of LE of wing above the TE
-        dihederal=0,  # Angle in degrees of root to wing tip
+        dihedral=0,  # Angle in degrees of root to wing tip
         sweep=0,  # Angle of sweep back in degrees of LE
         # 0 is perpendicular to root, >0 is sweept back, <0 is sweept forward
         shellThickness: float = 0.25,  # Thickness of wing surfaces and ribs
+        ribCount = 6, # Number of ribs
+        shortCut: bool = False,  # True to speed things up for testing
         ctx: object = None,  # Context used for show and dbg
     ) -> cq.Shape:
 
-        dihederal = math.radians(dihederal)
+        dihedral = math.radians(dihedral)
         sweep = math.radians(sweep)
         h: float = span / 2
         wingShellThickness: float = shellThickness
         ribThickness: float = wingShellThickness
 
         # Normalize, Scale, fattenTe
-        fTeAirfoil = af.scaleAirfoil(airfoilSeq, chord, shellThickness * 2, 0.20)
+        fTeAirfoil = af.scaleAirfoil(
+            airfoilSeq,
+            chord=chord,
+            teThickness=shellThickness * 2,
+            percentChordToFatten=0.20,
+        )
 
         airfoil = cq.Workplane("YZ").polyline(fTeAirfoil).close()
         dbg(f"valid(airfoil)={valid(airfoil)}")
@@ -44,71 +50,72 @@ class Wing:
 
         halfWing = airfoil.sweep(
             cq.Workplane("YX").spline(
-                [(0, 0, 0), (h * math.sin(sweep), h, h * math.sin(-dihederal))]
+                [(0, 0, 0), (h * math.sin(sweep), h, h * math.sin(-dihedral))]
             )
         )
         dbg(f"valid(halfWing)={valid(halfWing)}")
         # show(halfWing, ctx)
 
-        # Shell the halfWing
-        # halfWingShell = halfWing.shell(-0.25)
-        # show(halfWingShell, ctx)
+        fullWing: cq.Workplane
+        if not shortCut:
+            halfWingBb = halfWing.val().BoundingBox()
+            dbg(f"ylen={halfWingBb.ylen}, zlen={halfWingBb.zlen}")
 
-        halfWingBb = halfWing.val().BoundingBox()
-        dbg(f"ylen={halfWingBb.ylen}, zlen={halfWingBb.zlen}")
+            # Create the braces which the ribs will be cut from
+            braceCount = ribCount + 2
+            braceGap: float = h / (braceCount - 1)
+            bracePlates: List[cq.Shape] = []
+            for i in range(0, braceCount):
+                ribXPos = i * braceGap
+                if i == (braceCount - 1):
+                    ribXPos -= ribThickness
+                bracePlate = (
+                    cq.Workplane(
+                        "YZ",
+                        origin=(ribXPos, (halfWingBb.ylen) / 2, halfWingBb.zlen / 2),
+                    ).rect(halfWingBb.ylen * 1.10, halfWingBb.zlen * 1.50)
+                    # First rib is 1/2 ribThickness
+                    .extrude(ribThickness if i != 0 else ribThickness / 2)
+                )
+                # dbg(f'{i}: braceGap={braceGap} valid(bracePlate)={valid(bracePlate)}')
+                bracePlates.append(bracePlate)
+                # show(bracePlate, ctx)
+            dbg(f"valid(bracePlages)={valid(bracePlates)}")
 
-        # Create the braces which the ribs will be cut from
-        braceCount = 8
-        braceGap: float = h / (braceCount - 1)
-        bracePlates: List[cq.Shape] = []
-        for i in range(0, braceCount):
-            ribXPos = i * braceGap
-            if i == (braceCount - 1):
-                ribXPos -= ribThickness
-            bracePlate = (
-                cq.Workplane(
-                    "YZ", origin=(ribXPos, (halfWingBb.ylen) / 2, halfWingBb.zlen / 2)
-                ).rect(halfWingBb.ylen * 1.10, halfWingBb.zlen * 1.50)
-                # First rib is 1/2 ribThickness
-                .extrude(ribThickness if i != 0 else ribThickness / 2)
-            )
-            # dbg(f'{i}: braceGap={braceGap} valid(bracePlate)={valid(bracePlate)}')
-            bracePlates.append(bracePlate)
-            # show(bracePlate, ctx)
-        dbg(f"valid(bracePlages)={valid(bracePlates)}")
+            # Create the ribs
+            ribs = [plate.intersect(halfWing) for plate in bracePlates]
+            dbg(f"valid(ribs)={valid(ribs)}")
+            # for rib in ribs: show(rib, ctx)
 
-        # Create the ribs
-        ribs = [plate.intersect(halfWing) for plate in bracePlates]
-        dbg(f"valid(ribs)={valid(ribs)}")
-        # for rib in ribs: show(rib, ctx)
-
-        halfWingCutter = (
-            cq.Workplane("YZ")
-            .polyline(fTeAirfoil)
-            .close()
-            .offset2D(-wingShellThickness, "intersection")
-            .sweep(
-                cq.Workplane("YX").spline(
-                    [(0, 0, 0), (h * math.sin(sweep), h, h * math.sin(-dihederal))]
+            halfWingCutter = (
+                cq.Workplane("YZ")
+                .polyline(fTeAirfoil)
+                .close()
+                .offset2D(-wingShellThickness, "intersection")
+                .sweep(
+                    cq.Workplane("YX").spline(
+                        [(0, 0, 0), (h * math.sin(sweep), h, h * math.sin(-dihedral))]
+                    )
                 )
             )
-        )
-        dbg(f"valid(halfWingCutter)={valid(halfWingCutter)}")
-        # show(halfWingCutter, ctx)
+            dbg(f"valid(halfWingCutter)={valid(halfWingCutter)}")
+            # show(halfWingCutter, ctx)
 
-        # Cut out the center of the halfWing
-        halfWingHollow = halfWing.cut(halfWingCutter)
-        dbg(f"valid(halfWingHollow)={valid(halfWingHollow)}")
-        # show(halfWingHollow, ctx)
+            # Cut out the center of the halfWing
+            halfWingHollow = halfWing.cut(halfWingCutter)
+            dbg(f"valid(halfWingHollow)={valid(halfWingHollow)}")
+            # show(halfWingHollow, ctx)
 
-        # Union the ribs and wing, this is slow
-        halfWingWithRibs = halfWingHollow
-        for rib in ribs:
-            halfWingWithRibs = halfWingWithRibs.union(rib)
-        dbg(f"valid(halfWingWithRibs)={valid(halfWingWithRibs)}")
-        # show(halfWingWithRibs, ctx)
+            # Union the ribs and wing, this is slow
+            halfWingWithRibs = halfWingHollow
+            for rib in ribs:
+                halfWingWithRibs = halfWingWithRibs.union(rib)
+            dbg(f"valid(halfWingWithRibs)={valid(halfWingWithRibs)}")
+            # show(halfWingWithRibs, ctx)
+            fullWing = halfWingWithRibs.mirror("YZ").union(halfWingWithRibs)
+        else:
+            fullWing = halfWing.mirror("YZ").union(halfWing)
 
-        fullWing = halfWingWithRibs.mirror("YZ").union(halfWingWithRibs)
         dbg(f"valid(fullWing)={valid(fullWing)}")
         # show(fullWing, ctx)
 
@@ -129,5 +136,25 @@ class Wing:
 
 
 if __name__ == "__main__" or "show_object" in globals():
-    w = Wing.makeWing(naca5305, shellThickness=0.20)
-    show(w, ctx=globals())
+    shortCut: bool = True
+    chord = 50
+    span = 200
+    incidenceAngle = 2
+    dihedral = 5
+    sweep = 10
+    tk = 0.25
+    ribCount = 0
+    shortCut = False
+    wing = Wing.makeWing(
+        airfoilSeq=naca5305,
+        chord=chord,
+        span=span,
+        incidenceAngle=incidenceAngle,
+        dihedral=dihedral,
+        sweep=sweep,
+        shellThickness=tk,
+        ribCount=ribCount,
+        shortCut=shortCut,
+        ctx=globals(),
+    )
+    show(wing, ctx=globals())

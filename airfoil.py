@@ -13,7 +13,7 @@ def scaleAirfoil(
     airFoil: AirfoilSeq,
     chord: float,
     teThickness: float,
-    percentChordToFattenTe: float = 20,
+    percentChordToFatten: float = 0.20,
 ) -> AirfoilList:
     """
     Normalize, Scale, fattenTe an airfoil
@@ -23,7 +23,12 @@ def scaleAirfoil(
     sAirfoil: List[Tuple[float, float]] = scaleListOfTuple(nAirfoil, chord)
     fAirfoil: AirfoilList = cast(
         AirfoilList,
-        fattenTe(sAirfoil, teThickness, round(chord * percentChordToFattenTe)),
+        fattenTe(
+            af=sAirfoil,
+            t=teThickness,
+            chord=chord,
+            percentChordToFatten=percentChordToFatten,
+        ),
     )
 
     return fAirfoil
