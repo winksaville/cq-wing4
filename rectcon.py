@@ -91,7 +91,7 @@ if __name__ == "__main__" or "show_object" in globals():
         .translate((0, 0, c.maleBb.ylen / 2))
     )
     result = bodies.add(sticks).combine()
-    show(result)
+    show(result, ctx=globals())
 
     import io
 
