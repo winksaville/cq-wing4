@@ -16,6 +16,7 @@ def show(o: object, ctx=None):
     if o is None:
         dbg("o=None")
     elif ctx is not None and "show_object" in ctx:
+        dbg("show_object")
         ctx["show_object"](o)
     elif isinstance(o, cq.Shape):
         dbg(f"o.val().isValid()={o.val().isValid()}")
