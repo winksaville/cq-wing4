@@ -24,7 +24,7 @@ wing = Wing.makeWing(
     shortCut=shortCut,
     ctx=globals(),
 )
-show(wing, ctx=globals())
+# show(wing, ctx=globals())
 
 # TODO: We fudge cabin Z position so it aligns with trailing edge, why?
 cabinLength: float = chord
