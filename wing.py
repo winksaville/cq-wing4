@@ -25,7 +25,7 @@ class Wing:
         sweep=0,  # Angle of sweep back in degrees of LE
         # 0 is perpendicular to root, >0 is sweept back, <0 is sweept forward
         shellThickness: float = 0.25,  # Thickness of wing surfaces and ribs
-        ribCount = 6, # Number of ribs
+        ribCount: float = 6,  # Number of ribs
         shortCut: bool = False,  # True to speed things up for testing
         ctx: object = None,  # Context used for show and dbg
     ) -> cq.Shape:
