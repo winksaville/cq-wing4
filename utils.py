@@ -8,6 +8,15 @@ Y: int = 1
 Z: int = 2
 
 
+def show_object(o: object):
+    if o is None:
+        dbg("o=None")
+    elif isinstance(o, cq.Shape):
+        dbg(f"o.val().isValid()={o.val().isValid()}")
+    else:
+        dbg(f"vars={vars(o)}")
+
+
 def show(o: object, ctx=None):
     """
     Show an object, support show_object from cq-editor
@@ -25,6 +34,10 @@ def show(o: object, ctx=None):
 
 
 def dbg(*args):
+    print(*args)
+
+
+def log(*args):
     print(*args)
 
 
