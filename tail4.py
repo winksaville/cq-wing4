@@ -6,8 +6,8 @@ from rectcon import RectCon
 from utils import show
 from wing import Wing
 
-chord = 15
-span = 40
+chord = 20
+span = 80
 tk = 0.40
 
 horzStabilizer = cq.Workplane("XY").box(chord, span, tk).translate((0, 0, tk / 2))
@@ -32,7 +32,9 @@ boomZOffset: float = +boomDiameter / 2
 boom = (
     cq.Workplane("XZ")
     .circle(boomDiameter / 2)
-    .extrude(chord)
+    .workplane(offset=chord)
+    .circle(boomDiameter / 6)
+    .loft(combine=True)
     .rotate((0, 0, 0), (0, 0, 1), -90)
     .translate((boomXOffset, boomYOffset, boomZOffset))
 )
@@ -41,17 +43,13 @@ boom = (
 tail = stabilizer.union(boom)
 
 c = RectCon(xLen=2.25, yLen=2.25, zLen=6)
-xCut = c.male.rotate((0, 0, 0), (0, 1, 0), 90).translate(
-    (-chord / 2, 0, boomDiameter / 2)
-)
-yCut = c.male.rotate((0, 0, 0), (0, 1, 0), 270).translate(
+cut = c.receiver.rotate((0, 0, 0), (0, 1, 0), 270).translate(
     (chord / 2, 0, boomDiameter / 2)
 )
 # show(c.male, ctx=globals())
-# show(xCut, ctx=globals())
-# show(yCut, ctx=globals())
+# show(cut, ctx=globals())
 
-tail4 = tail.cut(xCut).cut(yCut)
+tail4 = tail.cut(cut)
 show(tail4, ctx=globals())
 
 import io

@@ -47,8 +47,8 @@ c = RectCon(xLen=2.25, yLen=2.25, zLen=6)
 # show(c.male, ctx=globals())
 
 wing4 = wingCabin.cut(
-    c.female.rotate((0, 0, 0), (1, 0, 0), 180).translate((0, cabinYOffset, chord))
-).cut(c.female.translate((0, cabinYOffset, cabinZOffset)))
+    c.receiver.rotate((0, 0, 0), (1, 0, 0), 180).translate((0, cabinYOffset, chord))
+).cut(c.receiver.translate((0, cabinYOffset, cabinZOffset)))
 show(wing4, ctx=globals())
 
 import io
