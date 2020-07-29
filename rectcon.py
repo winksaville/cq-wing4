@@ -1,12 +1,11 @@
-import math
 import typing
-from copy import copy, deepcopy
 from dataclasses import dataclass
+from math import cos, degrees, radians, sin
 from typing import Tuple
 
 import cadquery as cq  # type: ignore
 
-from utils import dbg, show
+from utils import X, Y, Z, dbg, show
 
 
 class RectCon:
@@ -14,6 +13,10 @@ class RectCon:
     A Rectangular Connector composed of a receiver and a dowel.
     The orientation for both is sitting vertically on the XY plane
     centered at the origin.
+
+    dowelAngle max=70 min=0
+
+    TODO: dowelAngles <0 and >70 degrees fail, why?
     """
 
     receiver: cq.Workplane
@@ -21,18 +24,23 @@ class RectCon:
 
     dowel: cq.Workplane
     dowelBb: cq.Workplane
+    dowelAngle: float
+    dowel_xLen: float
+    dowel_yLen: float
 
     def __init__(
         self,
         zLen: float = 6,
         xLen: float = 2.25,
         yLen: float = 2.25,
+        dowelAngle: float = 0.0,  # Maximum is 70deg(?) negs not supported(?)
         dowelShrinkage: float = 0.05,
-        fillets=0.250,
+        fillets: float = 0.250,
         ctx: object = None,
     ) -> None:
         dbg(f"RectCon.init: xLen={xLen} yLen={yLen} zLen={zLen}")
 
+        # Create the receiver
         r = (
             cq.Workplane("XY")
             .rect(xLen, yLen)
@@ -44,27 +52,93 @@ class RectCon:
         self.receiver = r
         self.receiverBb = self.receiver.val().BoundingBox()
         dbg(
-            f"receiverBb: xlen={self.receiverBb.xlen} ylen={self.receiverBb.ylen} zlen={self.receiverBb.zlen}"
+            f"receiverBb: xlen={self.receiverBb.xlen} ylen={self.receiverBb.ylen} zlen={self.receiverBb.zlen} a={dowelAngle}"
         )
         # show(self.receiver, ctx=globals())
 
-        halfD = (
+        # Compute basic dowel dimensions
+        dowel_xLen = xLen * (1 - dowelShrinkage)
+        dowel_yLen = yLen * (1 - dowelShrinkage)
+
+        # Bottom portion of Dowel
+        bottomD = (
             cq.Workplane("XY")
-            .rect(xLen * (1 - dowelShrinkage), yLen * (1 - dowelShrinkage))
+            .rect(dowel_xLen, dowel_yLen)
             .extrude(zLen)
-            .edges(">Z")
+            .faces("<Z")
             .fillet(fillets)
         )
+        # show(bottomD, ctx=globals())
 
-        d = (
-            halfD.rotate((0, 0, 0), (1, 0, 0), 180).union(halfD)
-            # .rotate((0, 0, 0), (1, 0, 0), 90)
-            .translate((0, 0, zLen))
+        if dowelAngle != 0:
+            # TODO: Figure out why 0 doesn't work for this path
+
+            # Wedge dimensions
+            halfA = radians(dowelAngle / 2)
+            chord: float = dowel_yLen * sin(halfA) * 2
+            sag: float = dowel_yLen * (1 - cos(halfA))
+            g: float = radians(90) - halfA
+            epX: float = -sin(g) * chord
+            epY: float = cos(g) * chord
+            ep: Tuple[float, float] = (epX, epY)
+            dbg(
+                f"halfA={degrees(halfA)} chord={chord} sag={sag}, g={degrees(g)} ep={ep}"
+            )
+
+            # Workplane for creating the wedge
+            wedgeWp = (
+                bottomD.faces("<Y")
+                .vertices("<X and >Z")
+                .workplane()
+                .transformed(rotate=cq.Vector(0, +90, 0))
+            )
+            # show(wedgeWp.circle(0.2), ctx=globals())
+            # show(wedgeWp.moveTo(1, 1).circle(0.2))
+
+            # Create the wedge
+            wedge = (
+                wedgeWp.sagittaArc(ep, sag)
+                .moveTo(ep[X], ep[Y])
+                .lineTo(0, dowel_yLen)
+                .close()
+                .extrude(dowel_yLen)
+            )
+            # show(wedge, ctx=globals())
+
+            bottomAndWedge = bottomD.union(wedge)
+            # show(bottomAndWedge, ctx=globals())
+
+            # Workplane for top portion of Dowel
+            topWp = (
+                bottomAndWedge.faces(">Y")
+                .vertices(">Z and <X")
+                .workplane()
+                .transformed(rotate=cq.Vector(-dowelAngle, 0, 0))
+                .moveTo(dowel_xLen / 2, -dowel_yLen / 2)
+            )
+            # show(topWp.circle(0.2), ctx=globals())
+        else:
+            bottomAndWedge = bottomD
+            topWp = bottomAndWedge.faces(">Z").workplane()
+        # show(bottomAndWedge, ctx=globals())
+
+        # Top portion of dowel
+        topD = (
+            topWp.rect(dowel_xLen, dowel_yLen).extrude(zLen).faces(">Z").fillet(fillets)
         )
-        self.dowel = d
+        # show(topD, ctx=globals())
+
+        # The competed dowel
+        completeD = bottomAndWedge.union(topD)
+        # show(completeD, ctx=globals())
+
+        self.dowel = completeD
         self.dowelBb = self.dowel.val().BoundingBox()
+        self.dowel_xLen = dowel_xLen
+        self.dowel_yLen = dowel_yLen
+        self.dowelAngle = dowelAngle
         dbg(
-            f"dowelBb: xlen={self.dowelBb.xlen} ylen={self.dowelBb.ylen} zlen={self.dowelBb.zlen}"
+            f"dowelBb: xlen={self.dowelBb.xlen} ylen={self.dowelBb.ylen} zlen={self.dowelBb.zlen} a={self.dowelAngle}"
         )
         # show(self.dowel, ctx=globals())
 
@@ -74,7 +148,7 @@ class RectCon:
         centered on the Z axis.
         """
         return self.dowel.rotate((0, 0, 0), (1, 0, 0), 90).translate(
-            (0, self.dowelBb.zlen / 2, self.dowelBb.ylen / 2)
+            (0, 0, self.dowel_yLen / 2)
         )
 
     def addReceiver(
@@ -105,28 +179,23 @@ class RectCon:
 
 if __name__ == "__main__" or "show_object" in globals():
 
-    c = RectCon(xLen=2.25, yLen=2.25, zLen=6)
+    c = RectCon(xLen=2.25, yLen=2.25, zLen=6, dowelAngle=8.0)
     # show(c.receiver, ctx=globals())
     # show(c.dowel, ctx=globals())
     # show(c.dowelHorz(), ctx=globals())
 
-    # bodyLen = 30
-    # body = cq.Workplane("XY").circle(bodyDiameter / 2).extrude(bodyLen)
-    # x = c.addReceiver(body, ">Z")
-    # show(x, ctx=globals())
-
-    # Create poles
-    bodyLen = 30
-    bodyDiameter = 4
-    body = cq.Workplane("XY").circle(bodyDiameter / 2).extrude(bodyLen)
-    bodyVert = body.cut(
-        c.receiver.rotate((0, 0, 0), (1, 0, 0), 180).translate((0, 0, bodyLen))
+    # Create beam
+    beamLen = 30
+    beamDiameter = 4
+    beam = cq.Workplane("XY").circle(beamDiameter / 2).extrude(beamLen)
+    beamVert = beam.cut(
+        c.receiver.rotate((0, 0, 0), (1, 0, 0), 180).translate((0, 0, beamLen))
     ).cut(c.receiver)
-    # show(bodyVert, ctx=globals())
-    bodyHorz = bodyVert.rotate((0, 0, 0), (1, 0, 0), 90).translate(
-        (20, 0, bodyDiameter / 2)
+    # show(beamVert, ctx=globals())
+    beamHorz = beamVert.rotate((0, 0, 0), (1, 0, 0), 90).translate(
+        (20, 0, beamDiameter / 2)
     )
-    # show(bodyHorz, ctx=globals())
+    # show(beamHorz, ctx=globals())
 
     # Create dowels
     dowel1 = c.dowelHorz().translate((40, 0, 0))
@@ -134,14 +203,14 @@ if __name__ == "__main__" or "show_object" in globals():
     dowel2 = c.dowelHorz().translate((60, 0, 0))
     # show(dowel2, ctx=globals())
 
-    result = bodyHorz.add(bodyVert).add(dowel1).add(dowel2).combine()
+    result = beamHorz.add(beamVert).add(dowel1).add(dowel2).combine()
     show(result, ctx=globals())
 
     import io
 
     tolerance = 0.001
     f = io.open(
-        f"rectcon-tol_{tolerance:.4f}-dia_{bodyDiameter:.4f}-x_{c.dowelBb.xlen:.4f}-y_{c.dowelBb.ylen:.4f}.stl",
+        f"rectcon-tol_{tolerance:.4f}-dia_{beamDiameter:.4f}-x_{c.dowelBb.xlen:.4f}-y_{c.dowelBb.ylen:.4f}-a_{c.dowelAngle:.4f}.stl",
         "w+",
     )
     cq.exporters.exportShape(result, cq.exporters.ExportTypes.STL, f, tolerance)
