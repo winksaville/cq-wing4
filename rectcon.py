@@ -147,8 +147,10 @@ class RectCon:
         Return dowel so its Horzitional laying on the XY plane
         centered on the Z axis.
         """
-        return self.dowel.rotate((0, 0, 0), (1, 0, 0), 90).translate(
-            (0, 0, self.dowel_yLen / 2)
+        return (
+            self.dowel.rotate((0, 0, 0), (1, 0, 0), 90)
+            .rotate((0, 0, 0), (0, 1, 0), 90)
+            .translate((0, 0, self.dowel_yLen / 2))
         )
 
     def addReceiver(
