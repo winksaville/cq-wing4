@@ -27,11 +27,11 @@ wing = Wing.makeWing(
 # Flip the wing so it LE is on the plate. I did this because
 # the last print the cabin warpped by 8degrees.
 wing = wing.rotate((0, 0, 0), (1, 0, 0), 180).translate((0, 0, chord))
-#show(wing, ctx=globals())
+# show(wing)
 
 # TODO: We fudge cabinLength so we are slightly past the trailing edge.
 # If we don't the trailing edge sticks ever so slightly past the cabin, why?
-cabinLength: float = chord*1.001
+cabinLength: float = chord * 1.001
 cabinDiameter: float = 4.0
 cabinYOffset: float = -1.0
 cabinZOffset: float = 0
@@ -42,24 +42,27 @@ cabin = (
     .rotate((0, 0, 0), (1, 0, 0), -90)
     .translate((0, cabinYOffset, cabinZOffset))
 )
-# show(cabin, ctx=globals())
+# show(cabin)
 
 wingCabin = wing.union(cabin)
-# show(wingCabin, ctx=globals())
+# show(wingCabin)
 
 c = RectCon(xLen=2.25, yLen=2.25, zLen=6)
-# show(c.male, ctx=globals())
+# show(c.male)
 
 wing4 = wingCabin.cut(
-    c.receiver.rotate((0, 0, 0), (1, 0, 0), 180).translate((0, cabinYOffset, cabinLength))
+    c.receiver.rotate((0, 0, 0), (1, 0, 0), 180).translate(
+        (0, cabinYOffset, cabinLength)
+    )
 ).cut(c.receiver.translate((0, cabinYOffset, cabinZOffset)))
-show(wing4, ctx=globals())
+show(wing4)
 
 import io
 
 tolerance = 0.001
 f = io.open(
-    f"wing4.01-LE-down-tol_{tolerance}-ch_{chord}-span_{span}-di_{dihedral}-tk_{tk}.stl", "w+"
+    f"wing4.02-LE-down-tol_{tolerance}-ch_{chord}-span_{span}-di_{dihedral}-tk_{tk}.stl",
+    "w+",
 )
 cq.exporters.exportShape(wing4, cq.exporters.ExportTypes.STL, f, tolerance)
 f.close()

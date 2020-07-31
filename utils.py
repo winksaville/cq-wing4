@@ -1,3 +1,4 @@
+import sys
 from functools import reduce
 from typing import List, Sequence, Tuple, Union
 
@@ -7,38 +8,30 @@ X: int = 0
 Y: int = 1
 Z: int = 2
 
+if "cq_editor" in sys.modules:
+    from __main__ import self as _cq_editor
+    from logbook import info as _cq_log
 
-def show_object(o: object):
-    if o is None:
-        dbg("o=None")
-    elif isinstance(o, cq.Shape):
-        dbg(f"o.val().isValid()={o.val().isValid()}")
-    else:
-        dbg(f"vars={vars(o)}")
+    def show(o: object):
+        _cq_editor.components["object_tree"].addObject(o)
 
-
-def show(o: object, ctx=None):
-    """
-    Show an object, support show_object from cq-editor
-    otherwise does the best it can.
-    """
-    if o is None:
-        dbg("o=None")
-    elif ctx is not None and "show_object" in ctx:
-        # dbg("show_object")
-        ctx["show_object"](o)
-    elif isinstance(o, cq.Shape):
-        dbg(f"o.val().isValid()={o.val().isValid()}")
-    else:
-        dbg(f"vars={vars(o)}")
+    def dbg(*args):
+        _cq_log(*args)
 
 
-def dbg(*args):
-    print(*args)
+else:
 
+    def show(o: object):
+        if o is None:
+            dbg("o=None")
+        elif isinstance(o, cq.Workplane):
+            for i, thing in enumerate(o.objects):
+                dbg(f"{i}: valid={o.val().isValid()} {vars(thing)}")
+        else:
+            dbg(vars(o))
 
-def log(*args):
-    print(*args)
+    def dbg(*args):
+        print(*args)
 
 
 def valid(wp: Union[cq.Workplane, Sequence[cq.Workplane]]) -> bool:
@@ -46,14 +39,3 @@ def valid(wp: Union[cq.Workplane, Sequence[cq.Workplane]]) -> bool:
         return reduce(lambda value, s: value and s.val().isValid(), wp, True)
     else:
         return wp.val().isValid()
-
-
-# def dbg(*args, ctx=None):
-#    """
-#    Output via log of cq-editor or use print
-#    """
-#    if ctx != None and 'log' in ctx:
-#        # This outputs the first parameter plus ctx :(
-#        ctx['log'](*args)
-#    else:
-#        print(*args)

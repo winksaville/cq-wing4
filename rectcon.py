@@ -54,7 +54,7 @@ class RectCon:
         dbg(
             f"receiverBb: xlen={self.receiverBb.xlen} ylen={self.receiverBb.ylen} zlen={self.receiverBb.zlen} a={dowelAngle}"
         )
-        # show(self.receiver, ctx=globals())
+        # show(self.receiver)
 
         # Compute basic dowel dimensions
         dowel_xLen = xLen * (1 - dowelShrinkage)
@@ -68,7 +68,7 @@ class RectCon:
             .faces("<Z")
             .fillet(fillets)
         )
-        # show(bottomD, ctx=globals())
+        # show(bottomD)
 
         if dowelAngle != 0:
             # TODO: Figure out why 0 doesn't work for this path
@@ -92,7 +92,7 @@ class RectCon:
                 .workplane()
                 .transformed(rotate=cq.Vector(0, +90, 0))
             )
-            # show(wedgeWp.circle(0.2), ctx=globals())
+            # show(wedgeWp.circle(0.2))
             # show(wedgeWp.moveTo(1, 1).circle(0.2))
 
             # Create the wedge
@@ -103,10 +103,10 @@ class RectCon:
                 .close()
                 .extrude(dowel_yLen)
             )
-            # show(wedge, ctx=globals())
+            # show(wedge)
 
             bottomAndWedge = bottomD.union(wedge)
-            # show(bottomAndWedge, ctx=globals())
+            # show(bottomAndWedge)
 
             # Workplane for top portion of Dowel
             topWp = (
@@ -116,21 +116,21 @@ class RectCon:
                 .transformed(rotate=cq.Vector(-dowelAngle, 0, 0))
                 .moveTo(dowel_xLen / 2, -dowel_yLen / 2)
             )
-            # show(topWp.circle(0.2), ctx=globals())
+            # show(topWp.circle(0.2))
         else:
             bottomAndWedge = bottomD
             topWp = bottomAndWedge.faces(">Z").workplane()
-        # show(bottomAndWedge, ctx=globals())
+        # show(bottomAndWedge)
 
         # Top portion of dowel
         topD = (
             topWp.rect(dowel_xLen, dowel_yLen).extrude(zLen).faces(">Z").fillet(fillets)
         )
-        # show(topD, ctx=globals())
+        # show(topD)
 
         # The competed dowel
         completeD = bottomAndWedge.union(topD)
-        # show(completeD, ctx=globals())
+        # show(completeD)
 
         self.dowel = completeD
         self.dowelBb = self.dowel.val().BoundingBox()
@@ -140,7 +140,7 @@ class RectCon:
         dbg(
             f"dowelBb: xlen={self.dowelBb.xlen} ylen={self.dowelBb.ylen} zlen={self.dowelBb.zlen} a={self.dowelAngle}"
         )
-        # show(self.dowel, ctx=globals())
+        # show(self.dowel)
 
     def dowelHorz(self) -> cq.Workplane:
         """
@@ -163,28 +163,28 @@ class RectCon:
         Add a receiver to the face of the shape passed.
         """
 
-        show(shape, ctx=globals())
+        show(shape)
         f = shape.faces(face)
         dbg(f"f={f}")
-        show(f, ctx=globals())
+        show(f)
         r = self.receiver
-        show(r, ctx=globals())
+        show(r)
         # f.cut(self.receiver.rotate((0, 0, 0), (1, 0, 0), 180).translate((0, 0, bodyLen))
         # cq.SelectbodyLen = 30
         # body = cq.Workplane("XY").circle(bodyDiameter / :2).extrude(bodyLen)
         # body1 = body.cut(
         #    c.receiver.rotate((0, 0, 0), (1, 0, 0), 180).translate((0, 0, bodyLen))
         # ).cut(c.receiver)
-        # show(body1, ctx=globals())
+        # show(body1)
         return shape
 
 
 if __name__ == "__main__" or "show_object" in globals():
 
     c = RectCon(xLen=2.25, yLen=2.25, zLen=6, dowelAngle=8.0)
-    # show(c.receiver, ctx=globals())
-    # show(c.dowel, ctx=globals())
-    # show(c.dowelHorz(), ctx=globals())
+    # show(c.receiver)
+    # show(c.dowel)
+    # show(c.dowelHorz())
 
     # Create beam
     beamLen = 30
@@ -193,20 +193,20 @@ if __name__ == "__main__" or "show_object" in globals():
     beamVert = beam.cut(
         c.receiver.rotate((0, 0, 0), (1, 0, 0), 180).translate((0, 0, beamLen))
     ).cut(c.receiver)
-    # show(beamVert, ctx=globals())
+    # show(beamVert)
     beamHorz = beamVert.rotate((0, 0, 0), (1, 0, 0), 90).translate(
         (20, 0, beamDiameter / 2)
     )
-    # show(beamHorz, ctx=globals())
+    # show(beamHorz)
 
     # Create dowels
     dowel1 = c.dowelHorz().translate((40, 0, 0))
-    # show(dowel1, ctx=globals())
+    # show(dowel1)
     dowel2 = c.dowelHorz().translate((60, 0, 0))
-    # show(dowel2, ctx=globals())
+    # show(dowel2)
 
     result = beamHorz.add(beamVert).add(dowel1).add(dowel2).combine()
-    show(result, ctx=globals())
+    show(result)
 
     import io
 

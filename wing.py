@@ -157,4 +157,4 @@ if __name__ == "__main__" or "show_object" in globals():
         shortCut=shortCut,
         ctx=globals(),
     )
-    show(wing, ctx=globals())
+    show(wing)

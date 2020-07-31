@@ -8,7 +8,7 @@ if __name__ == "__main__" or "show_object" in globals():
     # Create dowel
     c = RectCon(xLen=2.25, yLen=2.25, zLen=6, dowelAngle=8)
     dowel = c.dowelHorz()
-    show(dowel, ctx=globals())
+    show(dowel)
 
     import io
 
