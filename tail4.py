@@ -11,7 +11,7 @@ span = 80
 tk = 0.40
 
 horzStabilizer = cq.Workplane("XY").box(chord, span, tk).translate((0, 0, tk / 2))
-# show(horzStabilizer, ctx=globals())
+# show(horzStabilizer)
 
 vertStabilizer = (
     cq.Workplane("XY")
@@ -19,10 +19,10 @@ vertStabilizer = (
     .rotate((0, 0, 0), (1, 0, 0), 90)
     .translate((0, 0, span / 4))
 )
-# show(vertStabilizer, ctx=globals())
+# show(vertStabilizer)
 
 stabilizer = horzStabilizer.union(vertStabilizer)
-# show(stabilizer, ctx=globals())
+# show(stabilizer)
 
 boomLength: float = chord
 boomDiameter: float = 4.0
@@ -38,7 +38,7 @@ boom = (
     .rotate((0, 0, 0), (0, 0, 1), -90)
     .translate((boomXOffset, boomYOffset, boomZOffset))
 )
-# show(boom, ctx=globals())
+# show(boom)
 
 tail = stabilizer.union(boom)
 
@@ -46,11 +46,11 @@ c = RectCon(xLen=2.25, yLen=2.25, zLen=6)
 cut = c.receiver.rotate((0, 0, 0), (0, 1, 0), 270).translate(
     (chord / 2, 0, boomDiameter / 2)
 )
-# show(c.male, ctx=globals())
-# show(cut, ctx=globals())
+# show(c.male)
+# show(cut)
 
 tail4 = tail.cut(cut)
-show(tail4, ctx=globals())
+show(tail4)
 
 import io
 

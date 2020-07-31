@@ -6,14 +6,14 @@ from utils import dbg, show
 if __name__ == "__main__" or "show_object" in globals():
 
     c = RectCon(xLen=2.25, yLen=2.25, zLen=6)
-    # show(c.receiver, ctx=globals())
-    # show(c.dowel, ctx=globals())
-    # show(c.dowelHorz(), ctx=globals())
+    # show(c.receiver)
+    # show(c.dowel)
+    # show(c.dowelHorz())
 
     # beamLen = 30
     # beam = cq.Workplane("XY").circle(beamDiameter / 2).extrude(beamLen)
     # x = c.addReceiver(beam, ">Z")
-    # show(x, ctx=globals())
+    # show(x)
 
     # Create beam
     beamLen = 30
@@ -22,11 +22,11 @@ if __name__ == "__main__" or "show_object" in globals():
     beamVert = beam.cut(
         c.receiver.rotate((0, 0, 0), (1, 0, 0), 180).translate((0, 0, beamLen))
     ).cut(c.receiver)
-    # show(beamVert, ctx=globals())
+    # show(beamVert)
     beamHorz = beamVert.rotate((0, 0, 0), (1, 0, 0), 90).translate(
         (0, 0, beamDiameter / 2)
     )
-    show(beamHorz, ctx=globals())
+    show(beamHorz)
 
     import io
 

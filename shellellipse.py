@@ -1,4 +1,4 @@
-import cadquery as cq
+import cadquery as cq # type: ignore
 
 from utils import show
 

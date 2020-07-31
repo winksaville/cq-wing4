@@ -20,7 +20,7 @@ h = 100
 scaleFactor = 1 / naca5305[0][0]
 nNaca5305 = scaleListOfTuple(naca5305, scaleFactor)
 sNaca5305 = scaleListOfTuple(nNaca5305, chord)
-fNaca5305 = fattenTe(sNaca5305, 0.25, 10)
+fNaca5305 = fattenTe(sNaca5305, 0.25, 10, 0.20)
 # fNaca5305 = sNaca5305
 
 # Create the 2D airfoil then extrude
