@@ -1,6 +1,8 @@
 import cadquery as cq  # type: ignore
 
-from utils import show
+from utils import setCtx, show
+
+setCtx(globals())
 
 chord: float = 50
 h = 100

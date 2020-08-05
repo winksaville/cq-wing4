@@ -90,6 +90,10 @@ def fattenTe(
 
 if __name__ == "__main__" or "show_object" in globals():
 
+    from utils import setCtx
+
+    setCtx(globals())
+
     import airfoil as af
     from naca5305 import naca5305
     from scale import scaleListOfTuple
@@ -107,4 +111,4 @@ if __name__ == "__main__" or "show_object" in globals():
         af=sAirfoil, t=0.26 * 2, chord=chord, percentChordToFatten=0.20,
     )
     airfoil = cq.Workplane("YZ").polyline(fTeAirfoil).close()
-    show(airfoil)
+    show(airfoil, name="airfoil")

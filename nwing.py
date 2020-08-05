@@ -5,7 +5,9 @@ import cadquery as cq  # type: ignore
 from fattenTe import fattenTe
 from naca5305 import naca5305
 from scale import scaleListOfTuple
-from utils import show
+from utils import setCtx, show
+
+setCtx(globals())
 
 print(f"sys.path={sys.path}")
 

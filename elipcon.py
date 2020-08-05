@@ -82,7 +82,7 @@ class EllipseCon:
         )
         eBb = e.val().BoundingBox()
         dbg(f"eBb: xlen={eBb.xlen} ylen={eBb.ylen} zlen={eBb.zlen}")
-        # show(e)
+        # show(e, name="e")
 
         reliefOther = max(elip.xLen, elip.yLen)
         xRelief = (
@@ -92,7 +92,7 @@ class EllipseCon:
             .edges("<Z")
             .fillet(fillets)
         )
-        # show(xRelief)
+        # show(xRelief, name="xRelief")
 
         yRelief = (
             cq.Workplane("XY", origin=(0, 0, reliefHeight))
@@ -101,12 +101,12 @@ class EllipseCon:
             .edges("<Z")
             .fillet(fillets)
         )
-        # show(yRelief)
+        # show(yRelief, name="yRelief")
 
         # Cut out the reliefs
         self.male = e.cut(yRelief).cut(xRelief)
         # self.male = e.cut(xRelief).cut(yRelief) # BAD, why?
-        # show(self.male)
+        # show(self.male, name="self.male")
 
         maleBb = self.male.val().BoundingBox()
         dbg(f"maleBb: xlen={maleBb.xlen} ylen={maleBb.ylen} zlen={maleBb.zlen}")
@@ -117,8 +117,13 @@ class EllipseCon:
 
 
 if __name__ == "__main__" or "show_object" in globals():
+
+    from utils import setCtx
+
+    setCtx(globals())
+
     c = EllipseCon(Ellipse(xLen=6, yLen=10), height=10)
-    # show(c.male)
+    # show(c.male, name="c.male")
 
     bodyEllipse2d = Ellipse(xLen=8, yLen=12)
 
@@ -130,10 +135,10 @@ if __name__ == "__main__" or "show_object" in globals():
     )
     body = c.male.translate((0, 0, bodyLen)).union(body)
     body1 = body.cut(c.female)
-    # show(body1)
+    # show(body1, name="body1")
 
     body2 = copy(body1).translate((20, 0, 0))
-    # show(body2)
+    # show(body2, name="body2")
 
     result = (
         body1.add(body2)
@@ -141,7 +146,7 @@ if __name__ == "__main__" or "show_object" in globals():
         .rotate((0, 0, 0), (1, 0, 0), 90)
         .translate((0, 0, bodyEllipse2d.yLen / 2))
     )
-    show(result)
+    show(result, name="result")
 
     import io
 

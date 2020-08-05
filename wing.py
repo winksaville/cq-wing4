@@ -135,6 +135,11 @@ class Wing:
 
 
 if __name__ == "__main__" or "show_object" in globals():
+
+    from utils import setCtx
+
+    setCtx(globals())
+
     shortCut: bool = True
     chord = 50
     span = 200
