@@ -14,4 +14,4 @@ import io
 
 tolerance = 0.001
 fname = f"dowel-tol_{tolerance:.4f}-x_{c.dowelBb.xlen:.4f}-y_{c.dowelBb.ylen:.4f}-z_{c.dowelBb.zlen:.4f}-a_{c.dowelAngle:.4f}.stl"
-cq.exporters.export(beamHorz, fname, tolerance=tolerance)
+cq.exporters.export(dowel, fname, tolerance=tolerance)
