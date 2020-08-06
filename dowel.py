@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import math
+import sys
 
 import cadquery as cq  # type: ignore
 
@@ -9,48 +10,119 @@ from utils import dbg, setCtx, show
 
 setCtx(globals())
 
+dfltReceiver_xLen: float = 2.25
+dfltReceiver_yLen: float = 2.25
+dfltReceiver_zLen: float = 6
 dfltDowelAngleDegrees: float = 0
-dfltLinearPrecisionMm: float = 0.001
+dfltDowelClearence: float = 0.05
+dfltLinearPrecision: float = 0.001
 dfltAngularPrecisionDegrees: float = 1
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-a",
-    "--dowelAngle",
-    help=f"angle in degrees of a kinked dowel, default={dfltDowelAngleDegrees}",
-    nargs="?",
-    type=float,
-    default=math.radians(dfltDowelAngleDegrees),
-)
-parser.add_argument(
-    "-lp",
-    "--linearPrecision",
-    help=f"linear precision in milli-meters of stl file, default={dfltLinearPrecisionMm}",
-    nargs="?",
-    type=float,
-    default=dfltLinearPrecisionMm,
-)
-parser.add_argument(
-    "-ap",
-    "--angularPrecision",
-    help=f"angular precision in degrees of stl file, default={dfltAngularPrecisionDegrees}",
-    nargs="?",
-    type=float,
-    default=math.radians(dfltAngularPrecisionDegrees),
-)
-args = parser.parse_args()
 
+receiver_xLen: float
+receiver_yLen: float
+receiver_zLen: float
+dowelAngleDegrees: float
+dowelClearence: float
+linearPrecision: float
+angularPrecisionDegrees: float
+
+if "cq_editor" not in sys.modules:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-a",
+        "--dowelAngle",
+        help=f"angle in degrees of a kinked dowel, default={dfltDowelAngleDegrees}",
+        nargs=1,
+        type=float,
+        default=math.radians(dfltDowelAngleDegrees),
+    )
+    parser.add_argument(
+        "-x",
+        "--receiver_xLen",
+        help=f"X length in mm, default={dfltReceiver_xLen}",
+        nargs=1,
+        type=float,
+        default=dfltReceiver_xLen,
+    )
+    parser.add_argument(
+        "-y",
+        "--receiver_yLen",
+        help=f"Y length in mm, default={dfltReceiver_yLen}",
+        nargs=1,
+        type=float,
+        default=dfltReceiver_yLen,
+    )
+    parser.add_argument(
+        "-z",
+        "--receiver_zLen",
+        help=f"Z length in mm, default={dfltReceiver_zLen}",
+        nargs=1,
+        type=float,
+        default=dfltReceiver_zLen,
+    )
+    parser.add_argument(
+        "-c",
+        "--dowelClearence",
+        help=f"Clearence in mm per side, 2 * dowelClearence subtracted from x and y, default={dfltDowelClearence}",
+        nargs=1,
+        type=float,
+        default=dfltDowelClearence,
+    )
+    parser.add_argument(
+        "-lp",
+        "--linearPrecision",
+        help=f"linear precision in mm of stl file, default={dfltLinearPrecision}",
+        nargs=1,
+        type=float,
+        default=dfltLinearPrecision,
+    )
+    parser.add_argument(
+        "-ap",
+        "--angularPrecision",
+        help=f"angular precision in degrees of stl file, default={dfltAngularPrecisionDegrees}",
+        nargs=1,
+        type=float,
+        default=dfltAngularPrecisionDegrees,
+    )
+    args = parser.parse_args()
+
+    receiver_xLen = args.receiver_xLen
+    receiver_yLen = args.receiver_yLen
+    receiver_zLen = args.receiver_zLen
+    dowelAngleDegrees = args.dowelAngle
+    dowelClearence = args.dowelClearence
+    linearPrecision = args.linearPrecision
+    angularPrecisionDegrees = args.angularPrecision
+
+else:
+
+    receiver_xLen = dfltReceiver_xLen
+    receiver_yLen = dfltReceiver_yLen
+    receiver_zLen = dfltReceiver_zLen
+    dowelAngleDegrees = dfltDowelAngleDegrees
+    dowelClearence = dfltDowelClearence
+    linearPrecision = dfltLinearPrecision
+    angularPrecisionDegrees = dfltAngularPrecisionDegrees
+
+dbg(f"x={receiver_xLen}, y={receiver_yLen}, z={receiver_zLen}")
 # Create dowel
-c = RectCon(xLen=2.25, yLen=2.25, zLen=6, dowelAngle=args.dowelAngle)
+c = RectCon(
+    xLen=receiver_xLen,
+    yLen=receiver_yLen,
+    zLen=receiver_zLen,
+    dowelAngle=dowelAngleDegrees,
+)
 dowel = c.dowelHorz()
 show(dowel)
 
 import io
 
-linearPrecision: float = args.linearPrecision
-angularPrecision: float = args.angularPrecision
-fname = f"dowel-lp_{linearPrecision:.4f}-ap_{math.degrees(angularPrecision)}-x_{c.dowelBb.xlen:.4f}-y_{c.dowelBb.ylen:.4f}-z_{c.dowelBb.zlen:.4f}-a_{c.dowelAngle:.4f}.stl"
+fname = f"dowel-lp_{linearPrecision:.4f}-ap_{angularPrecisionDegrees}-x_{c.dowel_xLen:.4f}-y_{c.dowel_yLen:.4f}-z_{c.dowel_zLen:.4f}-a_{c.dowelAngle:.4f}.stl"
 dbg(f"fname={fname}")
 cq.exporters.export(
-    dowel, fname, tolerance=linearPrecision, angularPrecision=angularPrecision
+    dowel,
+    fname,
+    tolerance=linearPrecision,
+    angularPrecision=math.radians(angularPrecisionDegrees),
 )

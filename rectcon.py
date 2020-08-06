@@ -27,6 +27,7 @@ class RectCon:
     dowelAngle: float
     dowel_xLen: float
     dowel_yLen: float
+    dowel_zLen: float
 
     def __init__(
         self,
@@ -34,7 +35,8 @@ class RectCon:
         xLen: float = 2.25,
         yLen: float = 2.25,
         dowelAngle: float = 0.0,  # Maximum is 70deg(?) negs not supported(?)
-        dowelShrinkage: float = 0.05,
+        dowelClearence: float = 0.05,  # Clearence in mm per side, 2 * dowelClearence
+        # is subtracted from xLen and yLen
         fillets: float = 0.250,
     ) -> None:
         dbg(f"RectCon.init: xLen={xLen} yLen={yLen} zLen={zLen}")
@@ -56,14 +58,15 @@ class RectCon:
         # show(self.receiver, name="self.receiver")
 
         # Compute basic dowel dimensions
-        dowel_xLen = xLen * (1 - dowelShrinkage)
-        dowel_yLen = yLen * (1 - dowelShrinkage)
+        dowel_xLen = xLen - (2 * dowelClearence)
+        dowel_yLen = yLen - (2 * dowelClearence)
+        dowel_zLen = zLen - (2 * dowelClearence)
 
         # Bottom portion of Dowel
         bottomD = (
             cq.Workplane("XY")
             .rect(dowel_xLen, dowel_yLen)
-            .extrude(zLen)
+            .extrude(dowel_zLen)
             .faces("<Z")
             .fillet(fillets)
         )
@@ -123,7 +126,10 @@ class RectCon:
 
         # Top portion of dowel
         topD = (
-            topWp.rect(dowel_xLen, dowel_yLen).extrude(zLen).faces(">Z").fillet(fillets)
+            topWp.rect(dowel_xLen, dowel_yLen)
+            .extrude(dowel_zLen)
+            .faces(">Z")
+            .fillet(fillets)
         )
         # show(topD, name="topD")
 
@@ -135,6 +141,7 @@ class RectCon:
         self.dowelBb = self.dowel.val().BoundingBox()
         self.dowel_xLen = dowel_xLen
         self.dowel_yLen = dowel_yLen
+        self.dowel_zLen = dowel_zLen
         self.dowelAngle = dowelAngle
         dbg(
             f"dowelBb: xlen={self.dowelBb.xlen} ylen={self.dowelBb.ylen} zlen={self.dowelBb.zlen} a={self.dowelAngle}"
