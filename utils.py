@@ -51,6 +51,11 @@ else:
     def dbg(*args):
         print(*args)
 
+# Not sure how to "translate2d" natively in cadquery
+def translate2d(poly, t):
+    """Translate a 2D obect to a different location on a plane"""
+    return [(loc[X] + t[X], loc[Y] + t[Y]) for loc in poly]
+
 
 def valid(wp: Union[cq.Workplane, Sequence[cq.Workplane]]) -> bool:
     if isinstance(wp, Sequence):
