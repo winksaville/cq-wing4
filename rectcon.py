@@ -39,7 +39,9 @@ class RectCon:
         # is subtracted from xLen and yLen
         fillets: float = 0.250,
     ) -> None:
-        dbg(f"RectCon.init: xLen={xLen} yLen={yLen} zLen={zLen}")
+        dbg(
+            f"RectCon.init: xLen={xLen} yLen={yLen} zLen={zLen} dowlAngle={dowelAngle} dowelClearence={dowelClearence} fillets={fillets}"
+        )
 
         # Create the receiver
         r = (
