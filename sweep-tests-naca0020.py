@@ -9,15 +9,9 @@ from fattenTe import fattenTe
 from naca0005 import naca0005
 from naca0020 import naca0020
 from scale import scaleListOfTuple
-from utils import X, dbg, setCtx, show, translate2d, valid
+from utils import X, dbg, setCtx, show, translate2d, updatePending, valid
 
 setCtx(globals())
-
-
-def updatePendingWires(wp: cq.Workplane) -> cq.Workplane:
-    """Fix cq bug https://github.com/CadQuery/cadquery/issues/421"""
-    wp.ctx.pendingWires = []
-    return wp.toPending()
 
 
 # The path that we'll sweep
@@ -147,7 +141,7 @@ c = s1.add(s2)
 print(f"len(c.ctx.pendingWires)={len(c.ctx.pendingWires)}")
 
 # This will result in 2 pendingWires
-c = updatePendingWires(c)
+c = updatePending(c)
 
 # This will result in 3 pendingWires and assert will fail
 # c = c.toPending()

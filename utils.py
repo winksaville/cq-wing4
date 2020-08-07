@@ -51,6 +51,7 @@ else:
     def dbg(*args):
         print(*args)
 
+
 # Not sure how to "translate2d" natively in cadquery
 def translate2d(poly, t):
     """Translate a 2D obect to a different location on a plane"""
@@ -62,3 +63,18 @@ def valid(wp: Union[cq.Workplane, Sequence[cq.Workplane]]) -> bool:
         return reduce(lambda value, s: value and s.val().isValid(), wp, True)
     else:
         return wp.val().isValid()
+
+
+def updatePending(wp: cq.Workplane) -> cq.Workplane:
+    """
+    Clear pendingWires and pendingEdges and then add
+    objects that are wires or edges to the appropriate
+    pending list. Another way to fix this would be to
+    add a parameter to toPending which would do the
+    clear before the extending operation.
+
+    Fix cq bug https://github.com/CadQuery/cadquery/issues/421
+    """
+    wp.ctx.pendingWires = []
+    wp.ctx.pendingEdgs = []
+    return wp.toPending()
