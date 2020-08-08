@@ -53,9 +53,11 @@ else:
 
 
 # Not sure how to "translate2d" natively in cadquery
-def translate2d(poly, t):
+def translate2d(
+    lst: Sequence[Tuple[float, float]], t: Tuple[float, float]
+) -> List[Tuple[float, float]]:
     """Translate a 2D obect to a different location on a plane"""
-    return [(loc[X] + t[X], loc[Y] + t[Y]) for loc in poly]
+    return [(loc[X] + t[X], loc[Y] + t[Y]) for loc in lst]
 
 
 def valid(wp: Union[cq.Workplane, Sequence[cq.Workplane]]) -> bool:
