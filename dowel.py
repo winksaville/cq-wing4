@@ -17,8 +17,8 @@ dfltReceiver_yLen: float = 2.25
 dfltReceiver_zLen: float = 6
 dfltDowelAngleDegrees: float = 0
 dfltDowelClearence: float = 0.05
-dfltLinearPrecision: float = 0.001
-dfltAngularPrecisionDegrees: float = 1
+dfltLinearTolerance: float = 0.001
+dfltAngularToleranceDegrees: float = 0.1
 
 
 receiver_xLen: float
@@ -26,8 +26,8 @@ receiver_yLen: float
 receiver_zLen: float
 dowelAngleDegrees: float
 dowelClearence: float
-linearPrecision: float
-angularPrecisionDegrees: float
+linearTolerance: float
+angularToleranceDegrees: float
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -71,20 +71,20 @@ parser.add_argument(
     default=dfltDowelClearence,
 )
 parser.add_argument(
-    "-lp",
-    "--linearPrecision",
-    help=f"linear precision in mm of stl file, default={dfltLinearPrecision}",
+    "-lt",
+    "--linearTolerance",
+    help=f"linear precision in mm of stl file, default={dfltLinearTolerance}",
     nargs="?",
     type=float,
-    default=dfltLinearPrecision,
+    default=dfltLinearTolerance,
 )
 parser.add_argument(
-    "-ap",
-    "--angularPrecision",
-    help=f"angular precision in degrees of stl file, default={dfltAngularPrecisionDegrees}",
+    "-at",
+    "--angularTolerance",
+    help=f"angular precision in degrees of stl file, default={dfltAngularToleranceDegrees}",
     nargs="?",
     type=float,
-    default=dfltAngularPrecisionDegrees,
+    default=dfltAngularToleranceDegrees,
 )
 
 if "cq_editor" in sys.modules:
@@ -97,8 +97,8 @@ receiver_yLen = args.receiver_yLen
 receiver_zLen = args.receiver_zLen
 dowelAngleDegrees = args.dowelAngle
 dowelClearence = args.dowelClearence
-linearPrecision = args.linearPrecision
-angularPrecisionDegrees = args.angularPrecision
+linearTolerance = args.linearTolerance
+angularToleranceDegrees = args.angularTolerance
 
 dbg(f"x={receiver_xLen}, y={receiver_yLen}, z={receiver_zLen}, a={dowelAngleDegrees}")
 
@@ -114,11 +114,11 @@ show(dowel)
 
 import io
 
-fname = f"dowel-lp_{linearPrecision:.4f}-ap_{angularPrecisionDegrees}-x_{c.dowel_xLen:.4f}-y_{c.dowel_yLen:.4f}-z_{c.dowel_zLen:.4f}-a_{c.dowelAngle:.4f}.stl"
+fname = f"dowel-x_{c.dowel_xLen:.4f}-y_{c.dowel_yLen:.4f}-z_{c.dowel_zLen:.4f}-a_{c.dowelAngle:.4f}-lt_{linearTolerance:.4f}-at_{angularToleranceDegrees:.4f}.stl"
 dbg(f"fname={fname}")
 cq.exporters.export(
     dowel,
     fname,
-    tolerance=linearPrecision,
-    angularPrecision=math.radians(angularPrecisionDegrees),
+    tolerance=linearTolerance,
+    angularTolerance=math.radians(angularToleranceDegrees),
 )
