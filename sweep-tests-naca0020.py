@@ -9,7 +9,7 @@ from fattenTe import fattenTe
 from naca0005 import naca0005
 from naca0020 import naca0020
 from scale import scaleListOfTuple
-from utils import X, dbg, setCtx, show, translate2d, updatePending, valid
+from utils import X, dbg, setCtx, show, translate_2d, updatePending, valid
 
 setCtx(globals())
 
@@ -110,14 +110,14 @@ t: af.AirfoilSeq = af.AirfoilSeq(
         (1.000000, -0.000525),
     ]
 )
-# s1 = cq.Workplane("YZ").polyline(translate2d(scaleListOfTuple(t, 10.0), (-30, 30))).close()
+# s1 = cq.Workplane("YZ").polyline(translate_2d(scaleListOfTuple(t, 10.0), (-30, 30))).close()
 s1 = (
     cq.Workplane("YZ")
-    .polyline(translate2d(scaleListOfTuple(naca0005, 100.0), (-30, 30)))
+    .polyline(translate_2d(scaleListOfTuple(naca0005, 100.0), (-30, 30)))
     .close()
 )
-# s1 = cq.Workplane("YZ").polyline(translate2d(scaleListOfTuple(naca0020, 10.0), (-30, 30))).close()
-# s1 = cq.Workplane("YZ").polyline(translate2d(scaleListOfTuple([(1, 0), (0.4, 0.2), (0, 0), (0.4, -0.2)], 100.0), (-30, 30))).close()
+# s1 = cq.Workplane("YZ").polyline(translate_2d(scaleListOfTuple(naca0020, 10.0), (-30, 30))).close()
+# s1 = cq.Workplane("YZ").polyline(translate_2d(scaleListOfTuple([(1, 0), (0.4, 0.2), (0, 0), (0.4, -0.2)], 100.0), (-30, 30))).close()
 show(s1, name="s1")
 
 
@@ -131,7 +131,7 @@ show(s1, name="s1")
 # s2 = cq.Workplane("XY").moveTo(30, 0).ellipse(5, 20)
 s2 = (
     cq.Workplane("YX")
-    .polyline(translate2d(scaleListOfTuple(naca0020, 100.0), (-30, 30)))
+    .polyline(translate_2d(scaleListOfTuple(naca0020, 100.0), (-30, 30)))
     .close()
 )
 show(s2, name="s2")

@@ -52,8 +52,7 @@ else:
         print(*args)
 
 
-# Not sure how to "translate2d" natively in cadquery
-def translate2d(
+def translate_2d(
     lst: Sequence[Tuple[float, float]], t: Tuple[float, float]
 ) -> List[Tuple[float, float]]:
     """Translate a 2D obect to a different location on a plane"""
