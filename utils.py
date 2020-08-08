@@ -1,5 +1,6 @@
 import sys
 from functools import reduce
+from math import radians
 from typing import List, Sequence, Tuple, Union
 
 import cadquery as cq  # type: ignore
@@ -57,6 +58,79 @@ def translate_2d(
 ) -> List[Tuple[float, float]]:
     """Translate a 2D obect to a different location on a plane"""
     return [(loc[X] + t[X], loc[Y] + t[Y]) for loc in lst]
+
+
+def xDist_2d(line: Tuple[Tuple[float, float], Tuple[float, float]]) -> float:
+    return line[1][X] - line[0][X]
+
+
+def yDist_2d(line: Tuple[Tuple[float, float], Tuple[float, float]]) -> float:
+    return line[1][Y] - line[0][Y]
+
+
+def slope_using_dist_2d(xDist: float, yDist: float) -> float:
+    if xDist == 0:
+        # What about nan's and -0 this is why there is no math.sign
+        # See: https://stackoverflow.com/a/16726462
+        slope = (1 if yDist >= 0.0 else -1) * radians(90)
+    else:
+        slope = yDist / xDist
+
+    return slope
+
+
+def slope_2d(line: Tuple[Tuple[float, float], Tuple[float, float]]) -> float:
+    return slope_using_dist_2d(xDist_2d(line), yDist_2d(line))
+
+
+def slope_yIntercept_2d(
+    line: Tuple[Tuple[float, float], Tuple[float, float]]
+) -> Tuple[float, float]:
+    """
+    Return the two tuple (yIntercept, Slope) of line
+    """
+
+    # Line formula: y = (slope * x) + b
+    # b = y - (slope * x)
+    # yIntercept = b when x == 0
+    slope = slope_2d(line)
+    yIntercept = line[0][Y] - (slope * line[0][X])
+
+    return (slope, yIntercept)
+
+
+def split_2d(
+    lst: Sequence[Tuple[float, float]],
+    line: Tuple[Tuple[float, float], Tuple[float, float]],
+    retAbove=True,
+) -> List[Tuple[float, float]]:
+    """
+    Split the list defining a 2D object using line.
+    If retAbove it True return all points >= line else all point <= line
+
+    :param lst: is a sequence of 2D point tuples
+    :param line: a two tuple of 2D point tuples
+    :param retAbove:
+    """
+    # print(f"slipt_2d:+ lst={lst} line={line} retAbove={retAbove}")
+
+    slope, yIntercept = slope_yIntercept_2d(line)
+
+    # print(f"yIntercept={yIntercept}")
+
+    # Formula for a 2d line is y = slope * x + yYntercept
+    # Solve for lineY for each p[X]:
+    #   lineY = ((slope * p[X]) + yIntercept)
+    if retAbove:
+        # Valid point for newList if p[Y] >= lineY, otherwise skip
+        newList = [p for p in lst if p[Y] >= ((slope * p[X]) + yIntercept)]
+    else:
+        # Valid point for newList if p[Y] <= lineY, otherwise skip
+        newList = [p for p in lst if p[Y] <= ((slope * p[X]) + yIntercept)]
+    # print(f"slipt_2d: newList={newList}")
+
+    # print(f"slipt_2d:- lst={lst} line={line} retAbove={retAbove}")
+    return newList
 
 
 def valid(wp: Union[cq.Workplane, Sequence[cq.Workplane]]) -> bool:
