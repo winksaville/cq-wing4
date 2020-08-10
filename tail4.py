@@ -3,8 +3,8 @@ import cadquery as cq  # type: ignore
 from ellipse import Ellipse
 from naca0005 import naca0005
 from rectcon import RectCon
-from utils import show
 from wing import Wing
+from wing_utils import show
 
 chord = 20
 span = 80

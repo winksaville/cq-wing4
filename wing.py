@@ -7,7 +7,7 @@ import airfoil as af
 from fattenTe import fattenTe
 from naca5305 import naca5305
 from scale import scaleListOfTuple
-from utils import X, dbg, show, valid
+from wing_utils import X, dbg, show, valid
 
 
 class Wing:
@@ -136,7 +136,7 @@ class Wing:
 
 if __name__ == "__main__" or "show_object" in globals():
 
-    from utils import setCtx
+    from wing_utils import setCtx
 
     setCtx(globals())
 

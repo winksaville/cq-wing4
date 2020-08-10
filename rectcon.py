@@ -5,7 +5,7 @@ from typing import Tuple
 
 import cadquery as cq  # type: ignore
 
-from utils import X, Y, Z, dbg, show
+from wing_utils import X, Y, Z, dbg, show
 
 
 class RectCon:
@@ -189,7 +189,7 @@ class RectCon:
 
 if __name__ == "__main__" or "show_object" in globals():
 
-    from utils import setCtx
+    from wing_utils import setCtx
 
     setCtx(globals())
 

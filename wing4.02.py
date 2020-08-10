@@ -3,8 +3,8 @@ import cadquery as cq  # type: ignore
 from ellipse import Ellipse
 from naca5305 import naca5305
 from rectcon import RectCon
-from utils import dbg, setCtx, show
 from wing import Wing
+from wing_utils import dbg, setCtx, show
 
 setCtx(globals())
 

@@ -1,6 +1,6 @@
 import cadquery as cq  # type: ignore
 
-from utils import setCtx, show
+from wing_utils import setCtx, show
 
 setCtx(globals())
 

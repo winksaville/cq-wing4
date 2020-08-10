@@ -9,7 +9,7 @@ from fattenTe import fattenTe
 from naca0005 import naca0005
 from naca0020 import naca0020
 from scale import scaleListOfTuple
-from utils import X, dbg, setCtx, show, translate_2d, updatePending, valid
+from wing_utils import X, dbg, setCtx, show, translate_2d, updatePending, valid
 
 setCtx(globals())
 

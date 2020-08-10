@@ -3,7 +3,7 @@ from typing import List, Sequence, Tuple
 
 import cadquery as cq  # type: ignore
 
-from utils import X, Y, dbg, show
+from wing_utils import X, Y, dbg, show
 
 
 def fattenTe(
@@ -90,7 +90,7 @@ def fattenTe(
 
 if __name__ == "__main__" or "show_object" in globals():
 
-    from utils import setCtx
+    from wing_utils import setCtx
 
     setCtx(globals())
 

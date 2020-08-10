@@ -5,7 +5,7 @@ from typing import List, Sequence, Tuple
 
 import cadquery as cq  # type: ignore
 
-from utils import dbg, show
+from wing_utils import dbg, show
 
 
 @dataclass
@@ -118,7 +118,7 @@ class EllipseCon:
 
 if __name__ == "__main__" or "show_object" in globals():
 
-    from utils import setCtx
+    from wing_utils import setCtx
 
     setCtx(globals())
 

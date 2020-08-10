@@ -6,7 +6,7 @@ import sys
 import cadquery as cq  # type: ignore
 
 from rectcon import RectCon
-from utils import dbg, setCtx, show
+from wing_utils import dbg, setCtx, show
 
 setCtx(globals())
 

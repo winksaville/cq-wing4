@@ -5,7 +5,7 @@ import cadquery as cq  # type: ignore
 from fattenTe import fattenTe
 from naca5305 import naca5305
 from scale import scaleListOfTuple
-from utils import setCtx, show
+from wing_utils import setCtx, show
 
 setCtx(globals())
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import pytest  # type: ignore
 
-from utils import split_2d
+from wing_utils import split_2d
 
 
 def test_split_2d():
