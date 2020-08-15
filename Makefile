@@ -12,6 +12,9 @@ p:
 c:
 	cq-editor ${app}
 
+t:
+	pytest
+
 f:
 	isort *.py
 	black *.py
