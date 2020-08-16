@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import pytest  # type: ignore
+import pytest
 
 import wing_utils as wu
 
