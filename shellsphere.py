@@ -1,4 +1,4 @@
-import cadquery as cq  # type: ignore
+import cadquery as cq
 
 from wing_utils import show
 

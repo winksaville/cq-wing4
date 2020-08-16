@@ -1,6 +1,6 @@
 from typing import Iterable, List, NewType, Sequence, Tuple, cast
 
-import cadquery as cq  # type: ignore
+import cadquery as cq
 
 from fattenTe import fattenTe
 from scale import scaleListOfTuple

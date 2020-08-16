@@ -1,9 +1,9 @@
 import typing
 from dataclasses import dataclass
 from math import cos, degrees, radians, sin
-from typing import Tuple
+from typing import Tuple, cast
 
-import cadquery as cq  # type: ignore
+import cadquery as cq
 
 from wing_utils import X, Y, Z, dbg, show
 
@@ -20,10 +20,10 @@ class RectCon:
     """
 
     receiver: cq.Workplane
-    receiverBb: cq.Workplane
+    receiverBb: cq.BoundBox
 
     dowel: cq.Workplane
-    dowelBb: cq.Workplane
+    dowelBb: cq.BoundBox
     dowelAngle: float
     dowel_xLen: float
     dowel_yLen: float
@@ -53,7 +53,7 @@ class RectCon:
         )
 
         self.receiver = r
-        self.receiverBb = self.receiver.val().BoundingBox()
+        self.receiverBb = cast(cq.Shape, self.receiver.val()).BoundingBox()
         dbg(
             f"receiverBb: xlen={self.receiverBb.xlen} ylen={self.receiverBb.ylen} zlen={self.receiverBb.zlen} a={dowelAngle}"
         )
@@ -140,7 +140,7 @@ class RectCon:
         # show(completeD, name="completeD")
 
         self.dowel = completeD
-        self.dowelBb = self.dowel.val().BoundingBox()
+        self.dowelBb = cast(cq.Shape, self.dowel.val()).BoundingBox()
         self.dowel_xLen = dowel_xLen
         self.dowel_yLen = dowel_yLen
         self.dowel_zLen = dowel_zLen

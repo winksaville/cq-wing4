@@ -1,9 +1,9 @@
 import math
 from copy import copy, deepcopy
 from dataclasses import dataclass
-from typing import List, Sequence, Tuple
+from typing import List, Sequence, Tuple, cast
 
-import cadquery as cq  # type: ignore
+import cadquery as cq
 
 from wing_utils import dbg, show
 
@@ -25,8 +25,8 @@ class EllipseCon:
     An Ellipitical Connector
     """
 
-    femaleCutter: cq.Shape
-    male: cq.Shape
+    femaleCutter: cq.Workplane
+    male: cq.Workplane
 
     def __init__(self, elip: Ellipse, height: float, ctx: object = None,) -> None:
         dbg(f"Ellipse.make: elip={elip} height={height}")
@@ -108,7 +108,7 @@ class EllipseCon:
         # self.male = e.cut(xRelief).cut(yRelief) # BAD, why?
         # show(self.male, name="self.male")
 
-        maleBb = self.male.val().BoundingBox()
+        maleBb: cq.BoundBox = cast(cq.Shape, self.male.val()).BoundingBox()
         dbg(f"maleBb: xlen={maleBb.xlen} ylen={maleBb.ylen} zlen={maleBb.zlen}")
 
         self.female = e
@@ -133,7 +133,7 @@ if __name__ == "__main__" or "show_object" in globals():
         .ellipse(bodyEllipse2d.xAxis(), bodyEllipse2d.yAxis())
         .extrude(bodyLen)
     )
-    body = c.male.translate((0, 0, bodyLen)).union(body)
+    body = body.union(c.male.translate(cq.Vector(0, 0, bodyLen)))
     body1 = body.cut(c.female)
     # show(body1, name="body1")
 

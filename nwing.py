@@ -1,6 +1,7 @@
 import sys
+from typing import cast
 
-import cadquery as cq  # type: ignore
+import cadquery as cq
 
 from fattenTe import fattenTe
 from naca5305 import naca5305
@@ -29,7 +30,7 @@ fNaca5305 = fattenTe(sNaca5305, 0.25, 10, 0.20)
 # airfoil = cq.Workplane("YZ").spline(fNaca5305).close()
 airfoil = cq.Workplane("YZ").polyline(fNaca5305).close()
 halfWing = airfoil.extrude(h)
-halfWingBb = halfWing.val().BoundingBox()
+halfWingBb: cq.BoundBox = cast(cq.Shape, halfWing.val()).BoundingBox()
 
 # If workplane is >= 0.9902054 FAILS
 # splitWing = halfWing.faces("<Y").workplane(-chord*0.9902054).split(keepTop=True, keepBottom=False)

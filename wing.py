@@ -1,7 +1,7 @@
 import math
-from typing import List, Sequence, Tuple
+from typing import List, Sequence, Tuple, cast
 
-import cadquery as cq  # type: ignore
+import cadquery as cq
 
 import airfoil as af
 from fattenTe import fattenTe
@@ -27,7 +27,7 @@ class Wing:
         shellThickness: float = 0.25,  # Thickness of wing surfaces and ribs
         ribCount: int = 6,  # Number of ribs
         shortCut: bool = False,  # True to speed things up for testing
-    ) -> cq.Shape:
+    ) -> cq.Workplane:
 
         dihedral = math.radians(dihedral)
         sweep = math.radians(sweep)
@@ -57,13 +57,13 @@ class Wing:
 
         fullWing: cq.Workplane
         if not shortCut:
-            halfWingBb = halfWing.val().BoundingBox()
+            halfWingBb: cq.BoundBox = cast(cq.Shape, halfWing.val()).BoundingBox()
             dbg(f"ylen={halfWingBb.ylen}, zlen={halfWingBb.zlen}")
 
             # Create the braces which the ribs will be cut from
             braceCount: int = ribCount + 2
             braceGap: float = h / (braceCount - 1)
-            bracePlates: List[cq.Shape] = []
+            bracePlates: List[cq.Workplane] = []
             for i in range(0, braceCount):
                 ribXPos = i * braceGap
                 if i == (braceCount - 1):

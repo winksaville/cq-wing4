@@ -1,7 +1,7 @@
 from functools import reduce
 from typing import List, Sequence, Tuple
 
-import cadquery as cq  # type: ignore
+import cadquery as cq
 
 from wing_utils import X, Y, dbg, show
 

@@ -1,6 +1,6 @@
 import sys
 
-import cadquery as cq  # type: ignore
+import cadquery as cq
 
 from rectcon import RectCon
 from wing_utils import dbg, setCtx, show

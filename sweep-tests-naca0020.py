@@ -2,7 +2,7 @@ import math
 import sys
 from typing import List, Sequence, Tuple
 
-import cadquery as cq  # type: ignore
+import cadquery as cq
 
 import airfoil as af
 from fattenTe import fattenTe

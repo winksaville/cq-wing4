@@ -1,9 +1,9 @@
 import sys
 from functools import reduce
 from math import radians
-from typing import List, Sequence, Tuple, Union
+from typing import List, Sequence, Tuple, Union, cast
 
-# import cadquery as cq  # type: ignore
+# import cadquery as cq
 import cadquery as cq
 
 X: int = 0
@@ -47,9 +47,12 @@ else:
             dbg(f"{name}: o=None")
         elif isinstance(o, cq.Workplane):
             wp: cq.Workplane = o
-            dbg(f"{name}: valid={wp.val().isValid()} {vars(o)}")
+            if isinstance(wp.val(), cq.Shape):
+                dbg(f"{name}: valid={cast(cq.Shape, wp.val()).isValid()} {vars(o)}")
+            else:
+                dbg(f"{name}: vars(o))")
         else:
-            dbg(vars(o))
+            dbg(f"{name}: {vars(o)}")
 
     def dbg(*args):
         print(*args)
@@ -183,7 +186,7 @@ def intersectionLines_2d(
     y: float
     if determinant == 0:
         x = sys.float_info.max
-        y = sys.math.float_info.max
+        y = sys.float_info.max
     else:
         x = ((b2 * c1) - (b1 * c2)) / determinant
         y = ((a1 * c2) - (a2 * c1)) / determinant
@@ -275,9 +278,11 @@ def split_2d(
 
 def valid(wp: Union[cq.Workplane, Sequence[cq.Workplane]]) -> bool:
     if isinstance(wp, Sequence):
-        return reduce(lambda value, s: value and s.val().isValid(), wp, True)
+        return reduce(
+            lambda value, s: value and cast(cq.Shape, s.val()).isValid(), wp, True
+        )
     else:
-        return wp.val().isValid()
+        return cast(cq.Shape, wp.val()).isValid()
 
 
 def updatePending(wp: cq.Workplane) -> cq.Workplane:
@@ -291,5 +296,5 @@ def updatePending(wp: cq.Workplane) -> cq.Workplane:
     Fix cq bug https://github.com/CadQuery/cadquery/issues/421
     """
     wp.ctx.pendingWires = []
-    wp.ctx.pendingEdgs = []
+    wp.ctx.pendingEdges = []
     return wp.toPending()

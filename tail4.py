@@ -1,4 +1,4 @@
-import cadquery as cq  # type: ignore
+import cadquery as cq
 
 from ellipse import Ellipse
 from naca0005 import naca0005
