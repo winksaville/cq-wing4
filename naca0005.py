@@ -1,4 +1,5 @@
 # NACA 0005 Airfoil M=0.0% P=0.0% T=5.0%]
+# From: http://airfoiltools.com/airfoil/naca4digit?MNaca4DigitForm
 
 from airfoil import AirfoilSeq
 
