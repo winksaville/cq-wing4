@@ -64,13 +64,13 @@ def test_split_2d():
     linePt1 = (2, 0)
     linePt2 = (3, 0)
     # print(f"lst={lst} linePt1={linePt1} linePt2={linePt2}")
-    listAbove = wu.split_2d(lst=lst, linePt1=linePt1, linePt2=linePt2, retAbove=True)
+    listAbove = wu.split_2d(linePt1=linePt1, linePt2=linePt2, lst=lst, retAbove=True)
     # print(f"listAbove={listAbove}")
     assert all(
         [a == b for a, b in zip(listAbove, [(1, 0), (1, 0.01), (0.4, 0.2), (0, 0)])]
     )
 
-    listBelow = wu.split_2d(lst=lst, linePt1=linePt1, linePt2=linePt2, retAbove=False)
+    listBelow = wu.split_2d(linePt1=linePt1, linePt2=linePt2, lst=lst, retAbove=False)
     # print(f"listBelow={listBelow}")
     assert all(
         [a == b for a, b in zip(listBelow, [(1, 0), (0, 0), (0.4, -0.2), (1, -0.01)])]

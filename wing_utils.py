@@ -52,7 +52,7 @@ else:
             else:
                 dbg(f"{name}: vars(o))")
         else:
-            dbg(f"{name}: {vars(o)}")
+            dbg(f"{name}: {o}")
 
     def dbg(*args):
         print(*args)
@@ -223,9 +223,9 @@ def interpolatePt_2d(
 
 
 def split_2d(
-    lst: Sequence[Tuple[float, float]],
     linePt1: Tuple[float, float],
     linePt2: Tuple[float, float],
+    lst: Sequence[Tuple[float, float]],
     retAbove=True,
 ) -> List[Tuple[float, float]]:
     """
