@@ -21,7 +21,7 @@ c_zLen: float = 6
 # Dimensions for ballast bulb
 length: float = 15
 wallThickness: float = 0.5
-stubMinLength: float = c_zLen + 0.5
+stubMinLength: float = c_zLen + 1
 stubProtuding: float = 1
 stubDiameter: float = 4
 stubThickness: float = 4
@@ -90,3 +90,9 @@ result = ballastWithStub.cut(
     receiver.rotate((0, 0, 0), (0, 1, 0), -90).translate((stubX + stubLength, 0, 0))
 )
 show(result, "result")
+
+import io
+
+tolerance = 0.001
+fname = f"ballast-length_{length + stubLength}-tol_{tolerance}.stl"
+cq.exporters.export(result, fname, tolerance=tolerance)
