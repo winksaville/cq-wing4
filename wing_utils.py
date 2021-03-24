@@ -58,6 +58,30 @@ else:
         print(*args)
 
 
+def xDist_3d(linePt1: Tuple[float, float, float], linePt2: Tuple[float, float, float]) -> float:
+    xDist = linePt1[X] - linePt2[X]
+    # print(f"xDist_3d:+- xDist={xDist}")
+    return xDist
+
+
+def yDist_3d(linePt1: Tuple[float, float, float], linePt2: Tuple[float, float, float]) -> float:
+    yDist = linePt1[Y] - linePt2[Y]
+    # print(f"yDist_3d:+- yDist={yDist}")
+    return yDist
+
+
+def zDist_3d(linePt1: Tuple[float, float, float], linePt2: Tuple[float, float, float]) -> float:
+    zDist = linePt1[Z] - linePt2[Z]
+    # print(f"zDist_3d:+- zDist={zDist}")
+    return zDist
+
+
+def dist_3d(linePt1: Tuple[float, float, float], linePt2: Tuple[float, float, float]) -> float:
+    dist = sqrt(pow(xDist_3d(linePt1, linePt2), 2) + pow(yDist_3d(linePt1, linePt2), 2) + pow(zDist_3d(linePt1, linePt2), 2))
+    # print(f"dist_2d:+- dist={dist}")
+    return dist
+
+
 def xDist_2d(linePt1: Tuple[float, float], linePt2: Tuple[float, float]) -> float:
     xDist = linePt1[X] - linePt2[X]
     # print(f"xDist_2d:+- xDist={xDist}")
@@ -68,6 +92,12 @@ def yDist_2d(linePt1: Tuple[float, float], linePt2: Tuple[float, float]) -> floa
     yDist = linePt1[Y] - linePt2[Y]
     # print(f"yDist_2d:+- yDist={yDist}")
     return yDist
+
+
+def dist_2d(linePt1: Tuple[float, float], linePt2: Tuple[float, float]) -> float:
+    dist = sqrt(pow(xDist_2d(linePt1, lineP2), 2) + pow(yDist_2d(linePt1, linePt2), 2))
+    # print(f"dist_2d:+- dist={dist}")
+    return dist
 
 
 def sumPts(pt1: Tuple[float, float], pt2: Tuple[float, float]) -> Tuple[float, float]:
